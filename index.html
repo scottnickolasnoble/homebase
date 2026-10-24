@@ -778,15 +778,15 @@ function vToday() {
     .sort((a, b) => (nextDue(a) || '').localeCompare(nextDue(b) || ''));
   const dt = data.tasks.filter(doneToday);
   const overdue = due.filter(x => dueInfo(x).d < 0).length;
-  const weekAgo = relDate(-6);
-  const doneWeek = events().filter(e => (e.kind === 'cleaning' || (e.kind === 'todo' && e.done)) && e.d >= weekAgo).length;
+  // due in the next 7 days (today and overdue have their own cards)
+  const dueWeek = data.tasks.filter(x => isOpen(x) && !doneToday(x) && dueInfo(x).d >= 1 && dueInfo(x).d <= 7).length;
   const activeCount = data.projects.filter(p => !p.parentId && p.status !== 'done').length;
   const active = data.projects.filter(p => !isBig(p) && p.status === 'in-progress');
   return head(kicker, 'Today', acts) + bannerHTML() + dueBannerHTML() + `
   <section class="stats" aria-label="Summary">
     <button class="card stat" data-act="statSheet" data-v="today" aria-label="Due today: ${due.length - overdue}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Due today</p><p>${due.length - overdue}</p></button>
     <button class="card stat" data-act="statSheet" data-v="overdue" aria-label="Overdue: ${overdue}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Overdue</p><p style="color:${overdue ? 'var(--danger)' : 'inherit'}">${overdue}</p></button>
-    <button class="card stat" data-act="statSheet" data-v="week" aria-label="Done this week: ${doneWeek}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Done this week</p><p>${doneWeek}</p></button>
+    <button class="card stat" data-act="statSheet" data-v="week" aria-label="Due this week: ${dueWeek}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Due this week</p><p>${dueWeek}</p></button>
     <button class="card stat" data-act="statSheet" data-v="projects" aria-label="Active projects: ${activeCount}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Active projects</p><p>${activeCount}</p></button>
   </section>
   <div class="split">
@@ -1520,12 +1520,12 @@ function statSheetHTML(kind) {
     title = 'Overdue';
     body = list.map(x => taskRow(x)).join('') || '<p class="emptyline" style="border:0">Nothing overdue. Nice.</p>';
   } else if (kind === 'week') {
-    const from = relDate(-6);
-    const ev = events().filter(e => e.d >= from && (e.kind === 'cleaning' || (e.kind === 'todo' && e.done)));
-    title = 'Done this week';
+    const list = open.filter(x => dueInfo(x).d >= 1 && dueInfo(x).d <= 7).sort(byDue);
+    const label = d => daysBetween(t, d) === 1 ? 'Tomorrow' : `${WD[parseD(d).getDay()]}, ${fmt(d)}`;
+    title = 'Due this week';
     let last = ''; body = '';
-    ev.forEach(e => { if (e.d !== last) { body += `<h3 class="day">${esc(dayLabel(e.d))}</h3>`; last = e.d; } body += evRow(e); });
-    body = body || '<p class="emptyline" style="border:0">Nothing finished in the last 7 days yet.</p>';
+    list.forEach(x => { const d = nextDue(x); if (d !== last) { body += `<h3 class="grp" style="border-top:1px solid var(--line)">${esc(label(d))}</h3>`; last = d; } body += taskRow(x); });
+    body = body || '<p class="emptyline" style="border:0">Nothing else due in the next 7 days.</p>';
   } else {
     const list = data.projects.filter(p => !p.parentId && p.status !== 'done');
     title = 'Active projects';
@@ -1537,8 +1537,8 @@ function statSheetHTML(kind) {
 function openStatSheet(kind) {
   statOpen = kind; formCtx = null;
   const { title, body } = statSheetHTML(kind), d = $('#dlg');
-  const go = kind === 'week' ? '#history' : kind === 'projects' ? '#projects' : '#tasks';
-  const goLabel = kind === 'week' ? 'Open History' : kind === 'projects' ? 'All projects' : 'All tasks';
+  const go = kind === 'projects' ? '#projects' : '#tasks';
+  const goLabel = kind === 'projects' ? 'All projects' : 'All tasks';
   d.innerHTML = `<div class="dform">
     <div class="dhead"><h2 id="dtitle">${esc(title)}</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
     <div class="dbody" style="display:block;padding-top:0"><div class="sheetlist">${body}</div></div>
