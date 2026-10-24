@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Only these two accounts can see or change Homebase.
+    // Type both emails exactly as you created them in Authentication, in lowercase.
+    function isHousehold() {
+      return request.auth != null
+        && request.auth.token.email.lower() in ['you@example.com', 'wife@example.com'];
+    }
+
+    match /homes/{home} {
+      allow read, write: if isHousehold();
+
+      match /{collection}/{item} {
+        allow read, write: if isHousehold();
+      }
+    }
+  }
+}
