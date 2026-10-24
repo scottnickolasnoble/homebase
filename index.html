@@ -20,7 +20,7 @@
   --line:#E2E8E5; --line2:#EDF1EF; --tint:#F8FAF9;
   --accent:#1F7A63; --accent-ink:#1F6E5A; --accent-soft:#E3F1EC;
   --warn:#A04A08; --warn-soft:#FDF0E3; --info:#2F5E9E; --info-soft:#E8EEF7; --neu:#EEF2F0;
-  --danger:#B42318;
+  --danger:#B42318; --danger-soft:#FDECEA;
   --font:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
 }
@@ -40,14 +40,17 @@ h1,h2,h3,p{margin:0}
 .nav{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:10px;color:var(--soft);text-decoration:none;font-weight:500;font-size:14px}
 .nav:hover{background:var(--neu);color:var(--ink)}
 .nav.on{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.nav-settings{margin-top:auto}
 .content{flex:1 1 auto;min-width:0;padding:36px 40px 48px;display:flex;flex-direction:column;gap:24px;max-width:1200px}
+.signed-out .side{display:none}
+.signed-out .content{padding-bottom:40px}
 
 @media (max-width:760px){
   .shell{flex-direction:column}
   .side{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:20;flex-direction:row;gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line)}
-  .brand{display:none}
+  .brand,.nav-settings{display:none}
   .side .nav{flex:1 1 0;flex-direction:column;justify-content:center;gap:3px;min-height:52px;padding:4px 2px;font-size:11px;text-align:center}
-  .content{padding:calc(18px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));gap:20px}
+  .content{padding:calc(18px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom));gap:18px}
   h1{font-size:26px!important}
 }
 
@@ -56,6 +59,7 @@ h1,h2,h3,p{margin:0}
 .clip{overflow:hidden}
 .pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
 .p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--danger-soft);color:var(--danger)}
 .p-ok{background:var(--accent-soft);color:var(--accent-ink)}
 .p-neu{background:var(--neu);color:var(--soft)}
 .p-info{background:var(--info-soft);color:var(--info)}
@@ -65,8 +69,10 @@ h1,h2,h3,p{margin:0}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.danger{color:var(--danger);border-color:#F1C8C4}
 .btn.sm{min-height:36px;padding:0 14px;font-size:13px}
-.chip{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #D5DDD9;background:#fff;font-weight:600;font-size:13px;color:var(--soft);cursor:pointer;white-space:nowrap}
-.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid #D5DDD9;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--soft);cursor:pointer;text-decoration:none}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #D5DDD9;background:#fff;font-weight:600;font-size:13px;color:var(--soft);cursor:pointer;white-space:nowrap;text-decoration:none}
+.chip.on,.chip:has(input:checked){background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.soft{background:var(--accent-soft);border-color:#BFDCD1;color:var(--accent-ink)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .mut{color:var(--muted)}
 .sm-t{font-size:13px}
@@ -74,7 +80,7 @@ h1,h2,h3,p{margin:0}
 .phead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
 .kicker{margin:0 0 4px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
-.hact{display:flex;flex-wrap:wrap;gap:10px}
+.hact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px}
 .hd h2{font-size:17px;font-weight:700}
 .grp{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 20px 10px;font-size:14px;font-weight:700;border-top:1px solid var(--line);background:var(--tint)}
@@ -86,12 +92,29 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .split{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
 .col{display:flex;flex-direction:column;gap:24px;min-width:0}
 .emptyline{padding:18px 20px;border-top:1px solid var(--line2);color:var(--muted);font-size:14px}
-.notice{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:12px;background:var(--warn-soft);color:var(--warn);font-weight:600;font-size:14px}
 .empty{padding:28px;display:flex;flex-direction:column;gap:12px}
 .empty h2{font-size:20px}
 .empty p{color:var(--muted);line-height:1.55;font-size:15px}
 .row-btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 .foot{padding:12px 20px;border-top:1px solid var(--line2)}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;border-radius:12px;background:var(--neu)}
+.seg>*{min-height:42px;border:0;border-radius:9px;background:transparent;font-weight:600;font-size:14px;color:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;text-decoration:none}
+.seg>*[aria-checked="true"]{background:#fff;box-shadow:0 1px 3px rgba(22,32,29,.15);color:var(--ink);font-weight:700}
+.seg small{font-size:11px;font-weight:500;color:var(--muted)}
+
+/* banner */
+.banner{background:var(--ink);color:#fff;border-radius:14px;padding:14px 14px 14px 16px;display:flex;flex-direction:column;gap:10px}
+.banner .top{display:flex;align-items:flex-start;gap:12px}
+.banner p.s{margin-top:3px;font-size:13px;color:#C9D3CF;line-height:1.45}
+.banner .x{color:#C9D3CF;margin:-6px -6px 0 0}
+.banner .acts{padding-left:44px}
+.banner .acts .btn{background:#fff;color:var(--ink);border-color:#fff;min-height:36px;font-size:13px}
+
+/* avatars */
+.av{flex:none;width:30px;height:30px;border-radius:999px;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.av-me{background:var(--accent)}
+.av-other{background:var(--info)}
+.av-unk{background:#9AA7A2}
 
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
@@ -100,13 +123,14 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .stat p:last-child{margin-top:6px;font-size:28px;font-weight:700}
 
 /* task rows */
-.trow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 20px;border-top:1px solid var(--line2)}
-.tmain{flex:1 1 240px;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.trow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 20px;border-top:1px solid var(--line2)}
+.tmain{flex:1 1 220px;min-width:0;background:none;border:0;padding:0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:3px}
 .tname{font-size:15px;font-weight:600}
 .tsub{font-size:13px;color:var(--muted)}
-.tside{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tside{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tdue{font-size:13px;font-weight:600}
 .is-done .tname{color:var(--muted);text-decoration:line-through;font-weight:500}
+.is-done{background:#FAFBFA}
 
 /* project cards */
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
@@ -153,7 +177,6 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .upd p{font-size:14px;line-height:1.55;white-space:pre-line}
 .sub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:12px 20px;border-top:1px solid var(--line2);text-decoration:none;color:var(--ink)}
 .sub .sname{flex:1 1 200px;font-size:15px;font-weight:600}
-.sub .bar{flex:none;width:80px}
 .bl{display:flex;justify-content:space-between;gap:12px;padding:10px 20px;border-top:1px solid var(--line2);font-size:14px}
 
 /* rooms */
@@ -169,20 +192,47 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .rsplit>div>.sec-h:first-child{border-top:0}
 
 /* history */
-.hrow{display:flex;gap:14px;padding:12px 20px;border-top:1px solid var(--line2);font-size:14px;align-items:baseline}
-.hrow .d{flex:none;width:64px;font-size:13px;font-weight:700;color:var(--muted)}
+.day{padding:12px 20px 8px;font-size:12px;font-weight:700;color:var(--soft);background:var(--tint);border-top:1px solid var(--line);text-transform:uppercase;letter-spacing:.05em}
+.day:first-child{border-top:0}
+.ev{display:flex;gap:12px;padding:12px 20px;border-top:1px solid var(--line2);align-items:flex-start;text-decoration:none;color:var(--ink)}
+.day+.ev{border-top:0}
+.ev .et{font-size:14px;line-height:1.45}
+.ev .es{margin-top:3px;font-size:12px;color:var(--muted);display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.kind{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:600}
+.split-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--neu)}
+.gridcard .g{display:grid;grid-template-columns:minmax(0,1fr) repeat(7,30px);column-gap:4px;align-items:center;padding:7px 16px;border-top:1px solid var(--line2)}
+.gridcard .gh{font-size:11px;font-weight:600;color:var(--muted);text-align:center;border-top:0;padding-top:4px;padding-bottom:8px}
+.gridcard .gh span.today{background:var(--accent-soft);color:var(--ink);border-radius:7px;padding:2px 0}
+.gridcard .tn{font-size:13px;font-weight:600;line-height:1.3;padding-right:6px;min-width:0}
+.gridcard .ts{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+.gridcard .room{padding:10px 16px 6px;font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;background:var(--tint);border-top:1px solid var(--line)}
+.c{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:0;padding:0;background:#F3F6F5;color:transparent;cursor:pointer}
+.c.done-me{background:var(--accent);color:#fff}
+.c.done-other{background:var(--info);color:#fff}
+.c.done-unk{background:#9AA7A2;color:#fff}
+.c.done-dim{background:#D7DEDB;color:#fff}
+.c.od{background:var(--danger-soft);box-shadow:inset 0 0 0 1.5px #E7A39C}
+.c.today{background:#FFF8F0;box-shadow:inset 0 0 0 1.5px #D9A066}
+.c.fut{background:transparent;cursor:default}
+@media (max-width:500px){.gridcard .g{grid-template-columns:minmax(0,1fr) repeat(7,26px);column-gap:3px;padding:7px 12px}.c{width:26px;height:26px;border-radius:7px;font-size:11px}.gridcard .room{padding:10px 12px 6px}}
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--soft);font-weight:600}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .c{width:18px;height:18px;font-size:9px;border-radius:5px;cursor:default}
+.wknav{display:flex;align-items:center;justify-content:space-between;padding:8px 6px}
+.wknav button{width:44px;height:44px;border:0;background:none;font-size:24px;color:var(--soft);cursor:pointer;border-radius:10px}
+.wknav button:disabled{color:#C8D2CE;cursor:default}
 
 /* dialog */
 dialog{border:0;padding:0;border-radius:16px;width:min(520px,calc(100vw - 32px));max-height:calc(100dvh - 48px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(22,32,29,.25)}
 dialog::backdrop{background:rgba(22,32,29,.35)}
-#dform{display:flex;flex-direction:column;max-height:calc(100dvh - 48px)}
+.dform{display:flex;flex-direction:column;max-height:calc(100dvh - 48px)}
 .dhead{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px}
 .dhead h2{font-size:19px;font-weight:700}
 .x{width:44px;height:44px;border:0;background:none;font-size:26px;line-height:1;cursor:pointer;color:var(--muted);margin-right:-10px}
 .dbody{display:flex;flex-wrap:wrap;gap:14px 12px;padding:8px 20px 16px;overflow:auto}
 .fld{flex:1 1 100%;display:flex;flex-direction:column;gap:6px;min-width:0}
 .fld.half{flex:1 1 calc(50% - 6px)}
-.fld label{font-size:13px;font-weight:600;color:var(--soft)}
+.fld label,.flbl{font-size:13px;font-weight:600;color:var(--soft)}
 .fld input,.fld select,.fld textarea{width:100%;min-height:46px;border:1px solid #D5DDD9;border-radius:10px;padding:10px 12px;font-size:16px;background:#fff}
 .fld textarea{min-height:90px;resize:vertical}
 .fld .bad{border-color:var(--danger)}
@@ -190,15 +240,17 @@ dialog::backdrop{background:rgba(22,32,29,.35)}
 .hint{flex:1 1 100%;font-size:13px;color:var(--muted);line-height:1.5}
 .dact{display:flex;gap:10px;padding:14px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line2);flex-wrap:wrap}
 .sp{flex:1}
+.fsec{flex:1 1 100%;display:flex;flex-direction:column;gap:8px}
+.fsec h3{font-size:14px;font-weight:700}
+.ckrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}
+.ckrow label{display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px;font-weight:600}
 @media (max-width:760px){
   dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:18px 18px 0 0;max-height:92dvh}
-  #dform{max-height:92dvh}
+  .dform{max-height:92dvh}
 }
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:calc(100vw - 32px);text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
 @media (max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom))}}
-.signed-out .side{display:none}
-.signed-out .content{padding-bottom:40px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
@@ -210,10 +262,11 @@ dialog::backdrop{background:rgba(22,32,29,.35)}
       <span class="bname">Homebase</span>
     </div>
     <a class="nav" data-tab="today" href="#today"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</a>
-    <a class="nav" data-tab="cleaning" href="#cleaning"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Cleaning</a>
+    <a class="nav" data-tab="tasks" href="#tasks"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Tasks</a>
     <a class="nav" data-tab="projects" href="#projects"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Projects</a>
     <a class="nav" data-tab="rooms" href="#rooms"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Rooms</a>
-    <a class="nav" data-tab="more" href="#more"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>More</a>
+    <a class="nav" data-tab="history" href="#history"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History</a>
+    <a class="nav nav-settings" data-tab="settings" href="#settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
   </nav>
   <main class="content" id="view" tabindex="-1"></main>
 </div>
@@ -223,7 +276,7 @@ dialog::backdrop{background:rgba(22,32,29,.35)}
 
 <script type="module">
 /* =========================================================
-   Homebase — cleaning + home project tracker
+   Homebase — cleaning, to-dos + home projects
    Shared between household members through Firebase:
    sign in with email + password, data syncs live.
    ========================================================= */
@@ -231,7 +284,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, onSnapshot, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-/* ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE (Project settings → Your apps → Web app) ▼▼▼ */
+/* ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE (Settings → General → Your apps → Web app) ▼▼▼ */
 const firebaseConfig = {
   apiKey: "AIzaSyBeQ7QRj-ZLb0zOS7RiiJnLVfBeCrNIwfA",
   authDomain: "homebase-5cd93.firebaseapp.com",
@@ -242,8 +295,8 @@ const firebaseConfig = {
 };
 /* ▲▲▲ ------------------------------------------------------------------ ▲▲▲ */
 
-const HOME = 'main';                       // all household data lives under homes/main
-const COLLS = ['rooms', 'tasks', 'projects'];
+const HOME = 'main';                                   // all household data lives under homes/main
+const COLLS = ['rooms', 'tasks', 'projects', 'members'];
 const configured = !String(firebaseConfig.apiKey).startsWith('PASTE');
 
 let data = null;          // in-memory copy of everything; screens read from this
@@ -251,10 +304,11 @@ let user = null;          // signed-in Firebase user
 let authReady = false;
 let syncError = '';
 let auth, db, unsubs = [];
-const synced = { rooms: new Map(), tasks: new Map(), projects: new Map() }; // id -> JSON as last seen in the cloud
+const synced = Object.fromEntries(COLLS.map(c => [c, new Map()]));  // id -> JSON as last seen in the cloud
 let syncedMeta = '{}';
 let firstLoads = 0, pendingRender = false;
-const ui = { cleanFilter: 'all', cleanGroup: 'room', projFilter: 'all', showSubs: false, floor: 'all' };
+const HIST_DEFAULT = () => ({ view: 'list', range: '7', from: '', to: '', who: 'all', kinds: ['cleaning', 'todo', 'update', 'step'], room: 'all', limit: 60, week: 0 });
+const ui = { taskFilter: 'all', cleanGroup: 'room', projFilter: 'all', showSubs: false, floor: 'all', hist: HIST_DEFAULT(), recentNew: new Set() };
 
 /* ---------- old on-phone storage (only used to move data into the shared copy once) ---------- */
 const DB_NAME = 'homebase', STORE = 'kv';
@@ -267,17 +321,17 @@ function openDB() {
   });
 }
 async function dbGet(key) {
-  const db = await openDB();
+  const idb = await openDB();
   return new Promise((res, rej) => {
-    const q = db.transaction(STORE).objectStore(STORE).get(key);
+    const q = idb.transaction(STORE).objectStore(STORE).get(key);
     q.onsuccess = () => res(q.result);
     q.onerror = () => rej(q.error);
   });
 }
 async function dbSet(key, val) {
-  const db = await openDB();
+  const idb = await openDB();
   return new Promise((res, rej) => {
-    const tx = db.transaction(STORE, 'readwrite');
+    const tx = idb.transaction(STORE, 'readwrite');
     tx.objectStore(STORE).put(val, key);
     tx.oncomplete = () => res();
     tx.onerror = () => rej(tx.error);
@@ -310,7 +364,7 @@ function startSync() {
       });
       data[c] = [...synced[c].entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([, js]) => JSON.parse(js));
       normalize(data);
-      if (++firstLoads === COLLS.length) offerMove();
+      if (++firstLoads === COLLS.length) { ensureMember(); offerMove(); }
       scheduleRender();
     }, onErr));
   });
@@ -322,10 +376,11 @@ function startSync() {
   }, onErr));
 }
 function stopSync() { unsubs.forEach(u => u()); unsubs = []; }
+const loaded = () => firstLoads >= COLLS.length;
 
 // Compare what's on screen with what the cloud last sent; write only the items that changed.
 async function save() {
-  if (!user || !db || !data) return;
+  if (!user || !db || !data || !loaded()) return;
   const ops = [];
   for (const c of COLLS) {
     const cur = new Map(data[c].map(o => [o.id, stable(o)]));
@@ -363,27 +418,73 @@ async function offerMove() {
   const n = (old.rooms || []).length + (old.tasks || []).length + (old.projects || []).length;
   if (!n) return;
   if (confirm(`Found Homebase data saved on this phone from before sharing (${n} items).\n\nMove it into your shared Homebase?`)) {
-    data = normalize(old); commit(); toast('Moved into shared Homebase');
+    data = normalize({ ...old, members: data.members }); commit(); toast('Moved into shared Homebase');
   }
   try { await dbSet('data', ''); } catch {}
 }
 
+/* ---------- people ---------- */
+const me = () => user ? user.uid : '';
+const nowISO = () => new Date().toISOString();
+const myMember = () => data.members.find(m => m.id === me());
+function personName(uid, { you = 'You' } = {}) {
+  if (!uid) return null;
+  if (uid === me()) return you;
+  const m = data.members.find(x => x.id === uid);
+  return (m && m.name) || 'Your partner';
+}
+function initial(uid) {
+  if (!uid) return '✓';
+  const m = data.members.find(x => x.id === uid);
+  return ((m && m.name) || (uid === me() ? 'Y' : '?')).trim().charAt(0).toUpperCase() || '?';
+}
+const avCls = uid => !uid ? 'av-unk' : uid === me() ? 'av-me' : 'av-other';
+const avatar = uid => `<span class="av ${avCls(uid)}" aria-hidden="true">${esc(initial(uid))}</span>`;
+function ensureMember() {
+  if (!user) return;
+  let m = myMember();
+  if (!m) { m = { id: me(), email: user.email, name: '', seenAt: nowISO() }; data.members.push(m); save(); }
+  if (!m.seenAt) { m.seenAt = nowISO(); save(); }
+  if (!m.name) setTimeout(() => { if (!$('#dlg').open) nameForm(true); }, 300);
+}
+function nameForm(first) {
+  const m = myMember(); if (!m) return;
+  openForm({
+    title: first ? 'What should we call you?' : 'Your name',
+    fields: [{ key: 'name', label: 'First name', required: true, placeholder: 'Your first name' }],
+    values: { name: m.name || '' },
+    extra: '<p class="hint">Shows in History and on the "new to-do" banner on the other phone.</p>',
+    onSave: v => { m.name = v.name; },
+  });
+}
+
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+let lastT = 0;   // ids sort in the order things were created
+const uid = () => { let t = Date.now(); if (t <= lastT) t = lastT + 1; lastT = t; return t.toString(36) + Math.random().toString(36).slice(2, 7); };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pad = n => String(n).padStart(2, '0');
 const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const todayISO = () => iso(new Date());
+const dayOf = at => iso(new Date(at));                   // local date of a timestamp
 const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const daysBetween = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
 const relDate = n => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
 const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WD = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 function fmt(s) {
   if (!s) return '—';
   const d = parseD(s);
   const y = d.getFullYear() !== new Date().getFullYear() ? `, ${d.getFullYear()}` : '';
   return `${MON[d.getMonth()]} ${d.getDate()}${y}`;
+}
+const fmtTime = at => at ? new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase() : '';
+function dayLabel(d) {
+  const diff = daysBetween(d, todayISO());
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  const dt = parseD(d);
+  return diff < 7 && diff > 0 ? `${WD[dt.getDay()]}, ${fmt(d)}` : `${WD[dt.getDay()].slice(0, 3)}, ${fmt(d)}`;
 }
 function addEvery(s, ev) {
   const d = parseD(s), n = Math.max(1, +ev.n || 1);
@@ -400,14 +501,21 @@ function everyText(ev) {
   const n = Math.max(1, +ev.n || 1), u = UNIT[ev.unit] || UNIT.week;
   return n === 1 ? u[0] : `Every ${n} ${u[1]}s`;
 }
-const nextDue = t => t.lastDone ? addEvery(t.lastDone, t.every) : todayISO();
+const isOneoff = t => t.type === 'oneoff';
+const nextDue = t => isOneoff(t) ? (t.due || null) : (t.lastDone ? addEvery(t.lastDone, t.every) : todayISO());
+// Overdue = red, due today = amber, due within 3 days = blue, later or no date = grey (done today = green)
 function dueInfo(t) {
-  const d = daysBetween(todayISO(), nextDue(t));
-  if (d < 0) return { d, cls: 'warn', label: d === -1 ? '1 day late' : `${-d} days late` };
-  if (d === 0) return { d, cls: 'ok', label: 'Due today' };
-  if (d === 1) return { d, cls: 'neu', label: 'Tomorrow' };
+  const due = nextDue(t);
+  if (!due) return { d: Infinity, cls: 'neu', label: 'No date' };
+  const d = daysBetween(todayISO(), due);
+  if (d < 0) return { d, cls: 'bad', label: d === -1 ? 'Overdue · 1 day' : `Overdue · ${-d} days` };
+  if (d === 0) return { d, cls: 'warn', label: 'Due today' };
+  if (d === 1) return { d, cls: 'info', label: 'Due tomorrow' };
+  if (d <= 3) return { d, cls: 'info', label: `Due soon · ${d} days` };
   return { d, cls: 'neu', label: `In ${d} days` };
 }
+const doneToday = t => isOneoff(t) ? (t.done && t.doneAt && dayOf(t.doneAt) === todayISO()) : t.lastDone === todayISO();
+const isOpen = t => isOneoff(t) ? !t.done : true;
 const money = n => '$' + (+n || 0).toLocaleString('en-CA', { minimumFractionDigits: (+n % 1 ? 2 : 0), maximumFractionDigits: 2 });
 const roomName = id => (data.rooms.find(r => r.id === id) || {}).name || '';
 const roomOptions = () => [['', 'No room'], ...data.rooms.map(r => [r.id, r.name])];
@@ -415,7 +523,37 @@ const pill = (label, cls) => `<span class="pill p-${cls}">${esc(label)}</span>`;
 const bar = (pct, h = 6) => `<div class="bar" style="height:${h}px"><span style="width:${pct}%"></span></div>`;
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toast.tm); toast.tm = setTimeout(() => t.classList.remove('show'), 1800);
+  clearTimeout(toast.tm); toast.tm = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function upcomingSaturday() {
+  const d = new Date(); const wd = d.getDay();
+  if (wd === 6 || wd === 0) return iso(d);
+  d.setDate(d.getDate() + (6 - wd)); return iso(d);
+}
+
+/* ---------- new to-do banner ---------- */
+function newTodos() {
+  const m = myMember(); if (!m || !m.seenAt) return [];
+  return data.tasks.filter(t => isOneoff(t) && !t.done && t.createdBy && t.createdBy !== me() && (t.createdAt || '') > m.seenAt);
+}
+const isNew = t => ui.recentNew.has(t.id) || newTodos().includes(t);
+function markSeen() {
+  const m = myMember(); if (!m) return;
+  newTodos().forEach(t => ui.recentNew.add(t.id));
+  m.seenAt = nowISO();
+  commit();
+}
+function bannerHTML() {
+  const nt = newTodos(); if (!nt.length) return '';
+  const by = [...new Set(nt.map(t => t.createdBy))];
+  const who = by.length === 1 ? personName(by[0]) : 'Your household';
+  return `<section class="banner" role="status" aria-label="New to-dos">
+    <div class="top">${by.length === 1 ? avatar(by[0]) : avatar(null)}
+      <div style="flex:1;min-width:0"><p style="font-size:14px;font-weight:700">${esc(who)} added ${nt.length === 1 ? 'a new to-do' : nt.length + ' new to-dos'}</p>
+      <p class="s">${esc(nt.slice(0, 3).map(t => t.name).join(' · '))}${nt.length > 3 ? ' · …' : ''}</p></div>
+      <button class="x" data-act="dismissBanner" aria-label="Dismiss">×</button></div>
+    <div class="acts"><button class="btn" data-act="viewNew">View to-do${nt.length === 1 ? '' : 's'}</button></div>
+  </section>`;
 }
 
 /* ---------- projects ---------- */
@@ -457,15 +595,19 @@ function groupList(p) {
 /* ---------- data shape ---------- */
 function normalize(d) {
   d = d && typeof d === 'object' ? d : {};
-  d.version = 1; delete d.savedAt;
-  d.rooms = Array.isArray(d.rooms) ? d.rooms : [];
-  d.tasks = Array.isArray(d.tasks) ? d.tasks : [];
-  d.projects = Array.isArray(d.projects) ? d.projects : [];
+  d.version = 2; delete d.savedAt;
+  COLLS.forEach(c => { d[c] = Array.isArray(d[c]) ? d[c] : []; });
   d.rooms.forEach(r => { r.id = r.id || uid(); r.name = r.name || 'Room'; r.info = Array.isArray(r.info) ? r.info : []; });
   d.tasks.forEach(t => {
     t.id = t.id || uid(); t.name = t.name || 'Task';
-    t.every = t.every && UNIT[t.every.unit] ? t.every : { n: 1, unit: 'week' };
-    t.history = Array.isArray(t.history) ? t.history : [];
+    t.type = t.type === 'oneoff' ? 'oneoff' : 'recurring';
+    if (t.type === 'recurring') {
+      t.every = t.every && UNIT[t.every.unit] ? t.every : { n: 1, unit: 'week' };
+      t.history = Array.isArray(t.history) ? t.history : [];
+      t.log = Array.isArray(t.log) ? t.log : [];
+    } else {
+      t.done = !!t.done;
+    }
   });
   d.projects.forEach(p => {
     p.id = p.id || uid(); p.name = p.name || 'Project';
@@ -476,14 +618,14 @@ function normalize(d) {
   return d;
 }
 const hasData = () => data.tasks.length || data.projects.length || data.rooms.length;
-const needsBackup = () => hasData() && (!data.lastExport || daysBetween(data.lastExport.slice(0, 10), todayISO()) >= 14);
 
 /* ---------- router ---------- */
 function route() {
-  const [v, id] = (location.hash.slice(1) || 'today').split('/');
+  let [v, id] = (location.hash.slice(1) || 'today').split('/');
+  v = { cleaning: 'tasks', more: 'settings' }[v] || v;
   return { v, id: id ? decodeURIComponent(id) : '' };
 }
-const VIEWS = { today: vToday, cleaning: vCleaning, projects: vProjects, project: vProject, rooms: vRooms, more: vMore };
+const VIEWS = { today: vToday, tasks: vTasks, projects: vProjects, project: vProject, rooms: vRooms, history: vHistory, settings: vSettings };
 function render() {
   document.body.classList.toggle('signed-out', !user || !data);
   if (!configured) { $('#view').innerHTML = vSetup(); return; }
@@ -503,17 +645,35 @@ function render() {
 }
 const head = (kicker, title, actions = '') =>
   `<header class="phead"><div><p class="kicker">${esc(kicker)}</p><h1>${esc(title)}</h1></div><div class="hact">${actions}</div></header>`;
+const gearBtn = `<a class="iconbtn" href="#settings" aria-label="Settings and backup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>`;
 
-/* ---------- shared rows ---------- */
+/* ---------- task rows ---------- */
+function doneByText(t) {
+  if (isOneoff(t)) return t.doneBy ? `Done by ${personName(t.doneBy, { you: 'you' })}${t.doneAt ? ', ' + fmtTime(t.doneAt) : ''}` : 'Done';
+  const l = t.log.filter(x => x.d === todayISO()).pop();
+  return l && l.by ? `Done by ${personName(l.by, { you: 'you' })}, ${fmtTime(l.at)}` : 'Done today';
+}
 function taskRow(t, showRoom = true) {
-  const di = dueInfo(t), done = t.lastDone === todayISO();
   const room = showRoom && roomName(t.roomId) ? ' · ' + esc(roomName(t.roomId)) : '';
+  if (isOneoff(t)) {
+    const di = dueInfo(t), dt = doneToday(t);
+    const added = t.createdBy ? `Added by ${esc(personName(t.createdBy, { you: 'you' }))}` : 'To-do';
+    const sub = dt ? esc(doneByText(t)) + room : `To-do · ${added}${room}`;
+    const side = dt ? pill('Done today', 'ok')
+      : `${di.d !== 0 && t.due ? `<span class="tdue">Due ${fmt(t.due)}</span>` : ''}${pill(di.label, di.cls)}${isNew(t) ? pill('New', 'info') : ''}`;
+    return `<div class="trow${t.done ? ' is-done' : ''}">
+      <input type="checkbox" class="chk" aria-label="${esc(t.name)}" data-act="toggleTodo" data-id="${t.id}"${t.done ? ' checked' : ''}>
+      <button class="tmain" data-act="editTask" data-id="${t.id}"><span class="tname">${esc(t.name)}</span><span class="tsub">${sub}</span></button>
+      <div class="tside">${side}</div></div>`;
+  }
+  const di = dueInfo(t), dt = doneToday(t);
   const last = t.lastDone ? ' · Last done ' + fmt(t.lastDone) : ' · Not done yet';
-  const side = done
+  const sub = dt ? esc(everyText(t.every)) + room + ' · ' + esc(doneByText(t)) : esc(everyText(t.every)) + room + last;
+  const side = dt
     ? `${pill('Done today', 'ok')}<button class="chip" data-act="undoTask" data-id="${t.id}">Undo</button>`
-    : `${di.d !== 0 ? `<span class="tdue">Due ${fmt(nextDue(t))}</span>` : ''}${pill(di.d < 0 ? 'Overdue' : di.label, di.cls)}<button class="chip" data-act="doneTask" data-id="${t.id}">Done</button>`;
-  return `<div class="trow${done ? ' is-done' : ''}">
-    <button class="tmain" data-act="editTask" data-id="${t.id}"><span class="tname">${esc(t.name)}</span><span class="tsub">${esc(everyText(t.every))}${room}${last}</span></button>
+    : `${di.d !== 0 ? `<span class="tdue">Due ${fmt(nextDue(t))}</span>` : ''}${pill(di.label, di.cls)}<button class="chip" data-act="doneTask" data-id="${t.id}">Done</button>`;
+  return `<div class="trow${dt ? ' is-done' : ''}">
+    <button class="tmain" data-act="editTask" data-id="${t.id}"><span class="tname">${esc(t.name)}</span><span class="tsub">${sub}</span></button>
     <div class="tside">${side}</div></div>`;
 }
 function miniProject(p) {
@@ -555,35 +715,35 @@ async function doLogin(form) {
 /* ---------- Today ---------- */
 function vToday() {
   const kicker = new Date().toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
+  const acts = `<button class="btn" data-act="addProject">+ Project</button><button class="btn pri" data-act="addTask">+ Task</button>${gearBtn}`;
   if (!hasData()) {
-    return head(kicker, 'Today') + `<section class="card empty">
+    return head(kicker, 'Today', gearBtn) + bannerHTML() + `<section class="card empty">
       <h2>Welcome to Homebase</h2>
-      <p>Start by adding your rooms, then your cleaning tasks and projects. Or load some sample data to look around first — you can erase it later from More.</p>
-      <div class="row-btns"><a class="btn pri" href="#rooms">Add rooms</a><button class="btn" data-act="sample">Load sample data</button><button class="btn" data-act="import">Restore a backup</button></div>
+      <p>Start by adding your rooms, then your cleaning tasks, to-dos and projects. Or load some sample data to look around first — you can erase it later in Settings.</p>
+      <div class="row-btns"><a class="btn pri" href="#rooms">Add rooms</a><button class="btn" data-act="addTask">+ Task</button><button class="btn" data-act="sample">Load sample data</button></div>
     </section>`;
   }
-  const t = todayISO();
-  const due = data.tasks.filter(x => x.lastDone !== t && dueInfo(x).d <= 0).sort((a, b) => nextDue(a).localeCompare(nextDue(b)));
-  const doneToday = data.tasks.filter(x => x.lastDone === t);
+  const due = data.tasks.filter(x => isOpen(x) && !doneToday(x) && dueInfo(x).d <= 0)
+    .sort((a, b) => (nextDue(a) || '').localeCompare(nextDue(b) || ''));
+  const dt = data.tasks.filter(doneToday);
   const overdue = due.filter(x => dueInfo(x).d < 0).length;
   const weekAgo = relDate(-6);
-  const doneWeek = data.tasks.reduce((a, x) => a + x.history.filter(h => h >= weekAgo).length, 0);
+  const doneWeek = events().filter(e => (e.kind === 'cleaning' || (e.kind === 'todo' && e.done)) && e.d >= weekAgo).length;
   const activeCount = data.projects.filter(p => !p.parentId && p.status !== 'done').length;
   const active = data.projects.filter(p => !isBig(p) && p.status === 'in-progress');
-  const notice = needsBackup() ? `<div class="notice"><span>${data.lastExport ? 'Your last backup was ' + fmt(data.lastExport.slice(0, 10)) + '.' : "You haven't backed up yet."}</span><button class="btn sm" data-act="export">Back up now</button></div>` : '';
-  return head(kicker, 'Today', `<button class="btn" data-act="addProject">+ Project</button><button class="btn pri" data-act="addTask">+ Task</button>`) + notice + `
+  return head(kicker, 'Today', acts) + bannerHTML() + `
   <section class="stats" aria-label="Summary">
     <div class="card stat"><p>Due today</p><p>${due.length - overdue}</p></div>
-    <div class="card stat"><p>Overdue</p><p style="color:${overdue ? 'var(--warn)' : 'inherit'}">${overdue}</p></div>
+    <div class="card stat"><p>Overdue</p><p style="color:${overdue ? 'var(--danger)' : 'inherit'}">${overdue}</p></div>
     <div class="card stat"><p>Done this week</p><p>${doneWeek}</p></div>
     <div class="card stat"><p>Active projects</p><p>${activeCount}</p></div>
   </section>
   <div class="split">
     <section class="card clip" style="flex:3 1 440px;min-width:0">
-      <div class="hd"><h2>Cleaning to do</h2><a href="#cleaning" class="sm-t" style="font-weight:600;text-decoration:none">All tasks</a></div>
-      ${due.map(x => taskRow(x)).join('')}${doneToday.map(x => taskRow(x)).join('')}
-      ${!due.length && !doneToday.length ? '<p class="emptyline">Nothing due today. Enjoy it.</p>' : ''}
-      ${due.length === 0 && doneToday.length ? '<p class="emptyline">All caught up for today.</p>' : ''}
+      <div class="hd"><h2>To do today</h2><a href="#tasks" class="sm-t" style="font-weight:600;text-decoration:none">All tasks</a></div>
+      ${due.map(x => taskRow(x)).join('')}${dt.map(x => taskRow(x)).join('')}
+      ${!due.length && !dt.length ? '<p class="emptyline">Nothing due today. Enjoy it.</p>' : ''}
+      ${!due.length && dt.length ? '<p class="emptyline">All caught up for today.</p>' : ''}
     </section>
     <section class="col" style="flex:2 1 300px;gap:14px">
       <div class="hd" style="padding:0"><h2>Projects in progress</h2><a href="#projects" class="sm-t" style="font-weight:600;text-decoration:none">All projects</a></div>
@@ -592,61 +752,95 @@ function vToday() {
   </div>`;
 }
 
-/* ---------- Cleaning ---------- */
-function vCleaning() {
-  const overdueN = data.tasks.filter(t => dueInfo(t).d < 0).length;
-  let list = [...data.tasks];
-  if (ui.cleanFilter === 'overdue') list = list.filter(t => dueInfo(t).d < 0);
-  if (ui.cleanFilter === 'week') list = list.filter(t => dueInfo(t).d <= 6);
-  list.sort((a, b) => nextDue(a).localeCompare(nextDue(b)) || a.name.localeCompare(b.name));
-  const chip = (v, l) => `<button class="chip${ui.cleanFilter === v ? ' on' : ''}" data-act="set" data-k="cleanFilter" data-v="${v}">${l}</button>`;
+/* ---------- Tasks ---------- */
+function vTasks() {
+  const todos = data.tasks.filter(t => isOneoff(t) && (!t.done || doneToday(t)));
+  const openTodos = todos.filter(t => !t.done);
+  todos.sort((a, b) => (a.done - b.done) || ((a.due || '9999') .localeCompare(b.due || '9999')) || a.id.localeCompare(b.id));
+  const rec = data.tasks.filter(t => !isOneoff(t));
+  const overdueN = data.tasks.filter(t => isOpen(t) && dueInfo(t).d < 0).length;
+  const f = ui.taskFilter;
+  const chip = (v, l) => `<button class="chip${f === v ? ' on' : ''}" data-act="set" data-k="taskFilter" data-v="${v}">${l}</button>`;
+  const showTodo = f === 'all' || f === 'todo' || f === 'overdue';
+  const showRec = f === 'all' || f === 'recurring' || f === 'overdue';
+  let todoList = todos, recList = [...rec];
+  if (f === 'overdue') { todoList = todos.filter(t => !t.done && dueInfo(t).d < 0); recList = rec.filter(t => dueInfo(t).d < 0); }
+  recList.sort((a, b) => nextDue(a).localeCompare(nextDue(b)) || a.name.localeCompare(b.name));
+
   let groups = [];
   if (ui.cleanGroup === 'room') {
-    groups = data.rooms.map(r => [r.name, list.filter(t => t.roomId === r.id)]);
-    groups.push(['No room', list.filter(t => !data.rooms.some(r => r.id === t.roomId))]);
+    groups = data.rooms.map(r => [r.name, recList.filter(t => t.roomId === r.id)]);
+    groups.push(['No room', recList.filter(t => !data.rooms.some(r => r.id === t.roomId))]);
   } else {
     groups = [
-      ['Overdue', list.filter(t => dueInfo(t).d < 0)],
-      ['Today', list.filter(t => dueInfo(t).d === 0)],
-      ['This week', list.filter(t => dueInfo(t).d > 0 && dueInfo(t).d <= 6)],
-      ['Later', list.filter(t => dueInfo(t).d > 6)],
+      ['Overdue', recList.filter(t => dueInfo(t).d < 0)],
+      ['Today', recList.filter(t => dueInfo(t).d === 0)],
+      ['This week', recList.filter(t => dueInfo(t).d > 0 && dueInfo(t).d <= 6)],
+      ['Later', recList.filter(t => dueInfo(t).d > 6)],
     ];
   }
   groups = groups.filter(g => g[1].length);
-  const body = groups.length
-    ? groups.map(([name, ts]) => `<h2 class="grp"><span>${esc(name)} <span class="mut" style="font-weight:500">· ${ts.length}</span></span></h2>${ts.map(t => taskRow(t, ui.cleanGroup !== 'room')).join('')}`).join('')
-    : `<p class="emptyline" style="border:0">${data.tasks.length ? 'Nothing matches this filter.' : 'No cleaning tasks yet. Add your first one.'}</p>`;
-  return head(`${data.tasks.length} recurring task${data.tasks.length === 1 ? '' : 's'}`, 'Cleaning', `<button class="btn pri" data-act="addTask">+ Task</button>`) + `
-  <div class="chips">
-    ${chip('all', 'All')}${chip('overdue', `Overdue · ${overdueN}`)}${chip('week', 'Due this week')}
-    <label class="sm-t" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-weight:600;color:var(--soft)">Group by
-      <select data-change="cleanGroup" style="min-height:36px;border-radius:8px;border:1px solid #D5DDD9;padding:0 10px;background:#fff;font-size:14px">
-        <option value="room"${ui.cleanGroup === 'room' ? ' selected' : ''}>Room</option>
-        <option value="due"${ui.cleanGroup === 'due' ? ' selected' : ''}>Due date</option>
-      </select></label>
-  </div>
-  <section class="card clip">${body}</section>
+
+  const todoCard = showTodo && (f !== 'overdue' || todoList.length) ? `<section class="card clip">
+    <div class="hd"><h2>To-dos <span class="mut" style="font-size:13px;font-weight:600">· one-off</span></h2><button class="btn sm" data-act="addTask" data-type="oneoff">+ To-do</button></div>
+    ${todoList.map(t => taskRow(t)).join('') || '<p class="emptyline">No to-dos. Add one-off jobs here — they disappear once done (and stay in History).</p>'}
+    ${todoList.some(t => t.done) ? '<p class="emptyline sm-t" style="font-size:12px">Finished to-dos drop off after today and stay in History.</p>' : ''}
+  </section>` : '';
+  const recCard = showRec ? `<section class="card clip">
+    <div class="hd" style="flex-wrap:wrap"><h2>Recurring</h2>
+      <label class="sm-t" style="display:flex;align-items:center;gap:8px;font-weight:600;color:var(--soft)">Group by
+        <select data-change="cleanGroup" style="min-height:36px;border-radius:8px;border:1px solid #D5DDD9;padding:0 10px;background:#fff;font-size:14px">
+          <option value="room"${ui.cleanGroup === 'room' ? ' selected' : ''}>Room</option>
+          <option value="due"${ui.cleanGroup === 'due' ? ' selected' : ''}>Due date</option>
+        </select></label></div>
+    ${groups.length ? groups.map(([name, ts]) => `<h3 class="grp"><span>${esc(name)} <span class="mut" style="font-weight:500">· ${ts.length}</span></span></h3>${ts.map(t => taskRow(t, ui.cleanGroup !== 'room')).join('')}`).join('')
+      : `<p class="emptyline">${rec.length ? 'Nothing matches this filter.' : 'No recurring tasks yet. Add cleaning and chores that repeat.'}</p>`}
+  </section>` : '';
+  return head(`${openTodos.length} to-do${openTodos.length === 1 ? '' : 's'} · ${rec.length} recurring`, 'Tasks', `<button class="btn pri" data-act="addTask">+ Task</button>`) + `
+  <div class="chips">${chip('all', 'All')}${chip('todo', `To-dos · ${openTodos.length}`)}${chip('recurring', 'Recurring')}${chip('overdue', `Overdue · ${overdueN}`)}</div>
+  ${todoCard}${recCard}
   <p class="sm-t mut">Tap a task to edit it, see its notes and when it was done.</p>`;
 }
 function taskForm(t, preset = {}) {
   const isNew = !t;
-  const v = t ? { name: t.name, roomId: t.roomId || '', n: t.every.n, unit: t.every.unit, lastDone: t.lastDone || '', notes: t.notes || '' }
-              : { name: '', roomId: preset.roomId || '', n: 1, unit: 'week', lastDone: '', notes: '' };
-  const hist = t && t.history.length ? `<p class="hint">Done ${t.history.length} time${t.history.length > 1 ? 's' : ''}. Recent: ${t.history.slice(-6).reverse().map(fmt).join(', ')}</p>` : '';
+  const type = t ? t.type : (preset.type || 'recurring');
+  const one = type === 'oneoff';
+  const v = t ? { name: t.name, roomId: t.roomId || '', notes: t.notes || '', ...(one ? { due: t.due || '' } : { n: t.every.n, unit: t.every.unit, lastDone: t.lastDone || '' }) }
+              : { name: preset.name || '', roomId: preset.roomId || '', notes: preset.notes || '', n: 1, unit: 'week', lastDone: '', due: preset.due ?? todayISO() };
+  const seg = isNew ? `<div class="seg" role="radiogroup" aria-label="Task type" style="flex:1 1 100%">
+      <button type="button" role="radio" aria-checked="${!one}" data-ttype="recurring">Repeats<small>Cleaning, chores</small></button>
+      <button type="button" role="radio" aria-checked="${one}" data-ttype="oneoff">One-off<small>Do it once</small></button></div>` : '';
+  const fields = [{ key: 'name', label: one ? 'To-do' : 'Task', required: true, placeholder: one ? 'Book the chimney sweep' : 'Vacuum main floor' }];
+  if (one) fields.push({ key: 'due', label: 'Due (leave blank for no date)', type: 'date' });
+  else fields.push(
+    { key: 'n', label: 'Repeat every', type: 'number', min: 1, half: true },
+    { key: 'unit', label: 'Unit', type: 'select', half: true, options: [['day', 'Days'], ['week', 'Weeks'], ['month', 'Months'], ['year', 'Years']] },
+    { key: 'lastDone', label: 'Last done (leave blank if never)', type: 'date' });
+  fields.push({ key: 'roomId', label: 'Room', type: 'select', options: roomOptions() }, { key: 'notes', label: one ? 'Notes' : 'Notes — supplies, how-to', type: 'textarea' });
+  let extra = '';
+  if (one) {
+    extra = `<div class="chips" style="flex:1 1 100%;margin-top:-6px" aria-label="Quick due dates">
+      <button type="button" class="chip" data-setdue="${todayISO()}">Today</button><button type="button" class="chip" data-setdue="${relDate(1)}">Tomorrow</button>
+      <button type="button" class="chip" data-setdue="${upcomingSaturday()}">This weekend</button><button type="button" class="chip" data-setdue="">No date</button></div>`;
+    if (!isNew && t.createdBy) extra += `<p class="hint">Added by ${esc(personName(t.createdBy, { you: 'you' }))}${t.createdAt ? ' on ' + fmt(dayOf(t.createdAt)) : ''}.</p>`;
+    if (isNew && data.members.some(m => m.id !== me())) extra += `<p class="hint">${esc(data.members.filter(m => m.id !== me()).map(m => m.name || 'Your partner').join(' and '))} will see a "new to-do" banner next time they open Homebase.</p>`;
+  } else if (!isNew && t.history.length) {
+    extra = `<p class="hint">Done ${t.history.length} time${t.history.length > 1 ? 's' : ''}. Recent: ${t.history.slice(-6).reverse().map(fmt).join(', ')}</p>`;
+  }
   openForm({
-    title: isNew ? 'New cleaning task' : 'Edit task',
-    fields: [
-      { key: 'name', label: 'Task', required: true, placeholder: 'Vacuum main floor' },
-      { key: 'roomId', label: 'Room', type: 'select', options: roomOptions() },
-      { key: 'n', label: 'Repeat every', type: 'number', min: 1, half: true },
-      { key: 'unit', label: 'Unit', type: 'select', half: true, options: [['day', 'Days'], ['week', 'Weeks'], ['month', 'Months'], ['year', 'Years']] },
-      { key: 'lastDone', label: 'Last done (leave blank if never)', type: 'date' },
-      { key: 'notes', label: 'Notes — supplies, how-to', type: 'textarea' },
-    ],
-    values: v, extra: hist,
+    title: isNew ? 'New task' : (one ? 'Edit to-do' : 'Edit task'),
+    prefix: seg, fields, values: v, extra,
+    saveLabel: isNew ? (one ? 'Add to-do' : 'Add task') : 'Save',
     onSave: x => {
-      const o = { name: x.name, roomId: x.roomId, every: { n: Math.max(1, Math.round(x.n || 1)), unit: x.unit }, lastDone: x.lastDone || null, notes: x.notes };
-      if (isNew) data.tasks.push({ id: uid(), history: [], ...o }); else Object.assign(t, o);
+      if (one) {
+        const o = { name: x.name, roomId: x.roomId, notes: x.notes, due: x.due || '' };
+        if (isNew) data.tasks.push({ id: uid(), type: 'oneoff', done: false, createdAt: nowISO(), createdBy: me(), ...o });
+        else Object.assign(t, o);
+      } else {
+        const o = { name: x.name, roomId: x.roomId, every: { n: Math.max(1, Math.round(x.n || 1)), unit: x.unit }, lastDone: x.lastDone || null, notes: x.notes };
+        if (isNew) data.tasks.push({ id: uid(), type: 'recurring', history: [], log: [], ...o });
+        else Object.assign(t, o);
+      }
     },
     onDelete: isNew ? null : () => { data.tasks = data.tasks.filter(x => x !== t); },
   });
@@ -727,9 +921,12 @@ function projectForm(p, preset = {}) {
       const group = partOf ? (x.group !== undefined ? x.group : (preset.group || '')) : '';
       const o = { name: x.name, kind, status: x.status, roomId: x.roomId, description: x.description, budget: x.budget, startDate: x.startDate, targetDate: x.targetDate, parentId: partOf, group };
       if (partOf && group) { const par = findP(partOf); if (par && !par.groups.includes(group)) par.groups.push(group); }
+      const wasDone = p && p.status === 'done';
       let target = p;
       if (isNew) { target = { id: uid(), steps: [], measurements: [], parts: [], updates: [], quick: [], groups: [], ...o }; data.projects.push(target); }
       else Object.assign(p, o);
+      if (x.status === 'done' && !wasDone) { target.doneAt = nowISO(); target.doneBy = me(); }
+      if (x.status !== 'done') { target.doneAt = null; target.doneBy = null; }
       touch(target);
       if (isNew && !preset.parentId) location.hash = '#project/' + target.id;
     },
@@ -778,7 +975,7 @@ function vRegular(p) {
       <div class="pmeta">${x.qty ? `<span><span class="mut">Qty</span> <b>${esc(x.qty)}</b></span>` : ''}${x.where ? `<span class="mut">${esc(x.where)}</span>` : ''}<span style="font-weight:700">${x.cost != null && x.cost !== '' ? money(x.cost) : '—'}</span>
       <button class="pill pillbtn ${x.have ? 'p-ok' : 'p-warn'}" data-act="toggle" data-kind="parts" data-pid="${p.id}" data-iid="${x.id}" data-field="have" aria-label="${x.have ? 'Have it — tap to mark to buy' : 'To buy — tap to mark as have'}">${x.have ? 'Have' : 'To buy'}</button></div>
     </div>`, 'No parts yet. Add materials with sizes so you have them at the store.');
-  const upds = [...p.updates].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const upds = [...p.updates].sort((a, b) => ((b.at || b.date || '')).localeCompare(a.at || a.date || ''));
   return back + hero(p, stats, pr) + `
   <div class="split">
     <section class="card clip" style="flex:1 1 340px;min-width:0">
@@ -794,7 +991,7 @@ function vRegular(p) {
   <section class="card clip">
     <div class="hd"><h2>Updates</h2></div>
     <div class="updform"><label for="updText" class="vh">Post an update</label><input id="updText" data-pid="${p.id}" placeholder="What did you get done?" autocomplete="off" enterkeyhint="send"><button class="btn pri" data-act="postUpdate" data-pid="${p.id}">Post</button></div>
-    ${upds.map(u => `<button class="upd" data-act="editItem" data-kind="updates" data-pid="${p.id}" data-iid="${u.id}"><span class="d">${fmt(u.date)}</span><p>${esc(u.text)}</p></button>`).join('')}
+    ${upds.map(u => `<button class="upd" data-act="editItem" data-kind="updates" data-pid="${p.id}" data-iid="${u.id}"><span class="d">${fmt(u.date)}</span><span style="min-width:0"><p>${esc(u.text)}</p>${u.by ? `<span class="mut" style="font-size:12px">${esc(personName(u.by))}</span>` : ''}</span></button>`).join('')}
   </section>`;
 }
 function vBig(p) {
@@ -880,7 +1077,15 @@ function itemForm(kind, pid, iid) {
     fields: K.f,
     values: it || (kind === 'updates' ? { date: todayISO() } : {}),
     onSave: v => {
-      if (it) Object.assign(it, v); else o[kind].push({ id: uid(), ...v });
+      if (it) {
+        if (kind === 'parts' && v.have && !it.have) { v.haveAt = nowISO(); v.haveBy = me(); }
+        Object.assign(it, v);
+      } else {
+        const n = { id: uid(), ...v };
+        if (kind === 'updates') { n.at = nowISO(); n.by = me(); }
+        if (kind === 'parts' && v.have) { n.haveAt = nowISO(); n.haveBy = me(); }
+        o[kind].push(n);
+      }
       if (kind === 'steps' && !it && o.status === 'done') o.status = 'in-progress';
       touch(o);
     },
@@ -890,11 +1095,11 @@ function itemForm(kind, pid, iid) {
 
 /* ---------- Rooms ---------- */
 function roomStatus(r) {
-  const ts = data.tasks.filter(t => t.roomId === r.id);
+  const ts = data.tasks.filter(t => t.roomId === r.id && isOpen(t));
   if (!ts.length) return '<span class="mut">No tasks</span>';
-  const od = ts.filter(t => dueInfo(t).d < 0).length, dt = ts.filter(t => dueInfo(t).d === 0 && t.lastDone !== todayISO()).length;
-  if (od) return pill(`${od} overdue`, 'warn');
-  if (dt) return pill(`${dt} due today`, 'ok');
+  const od = ts.filter(t => dueInfo(t).d < 0).length, dt = ts.filter(t => dueInfo(t).d === 0 && !doneToday(t)).length;
+  if (od) return pill(`${od} overdue`, 'bad');
+  if (dt) return pill(`${dt} due today`, 'warn');
   return pill('All caught up', 'neu');
 }
 function vRooms(id) {
@@ -907,12 +1112,12 @@ function vRooms(id) {
     const np = data.projects.filter(p => p.roomId === r.id && !isBig(p) && p.status !== 'done').length;
     return `<a class="card rc${sel && sel.id === r.id ? ' sel' : ''}" href="#rooms/${r.id}"${sel && sel.id === r.id ? ' aria-current="true"' : ''}>
       <div>${r.floor ? `<p class="fl">${esc(r.floor)}</p>` : ''}<h2>${esc(r.name)}</h2></div>
-      <div class="ln"><span class="mut">Cleaning</span>${roomStatus(r)}</div>
+      <div class="ln"><span class="mut">Tasks</span>${roomStatus(r)}</div>
       <div class="ln"><span class="mut">Projects</span>${np ? `<b>${np} active</b>` : '<span class="mut">None</span>'}</div></a>`;
   }).join('');
   let detail = '';
   if (sel) {
-    const ts = data.tasks.filter(t => t.roomId === sel.id).sort((a, b) => nextDue(a).localeCompare(nextDue(b)));
+    const ts = data.tasks.filter(t => t.roomId === sel.id && (isOpen(t) || doneToday(t))).sort((a, b) => (nextDue(a) || '9999').localeCompare(nextDue(b) || '9999'));
     const ps = data.projects.filter(p => p.roomId === sel.id && !isBig(p));
     detail = `<section class="card clip" id="roomDetail">
       <div class="hd" style="flex-wrap:wrap"><div>${sel.floor ? `<p class="fl mut sm-t" style="font-weight:600">${esc(sel.floor)}</p>` : ''}<h2 style="font-size:22px">${esc(sel.name)}</h2></div><button class="btn sm" data-act="editRoom" data-id="${sel.id}">Edit room</button></div>
@@ -923,8 +1128,8 @@ function vRooms(id) {
           <div class="foot"><button class="btn sm" data-act="addItem" data-kind="info" data-pid="${sel.id}">+ Add info</button></div>
         </div>
         <div>
-          <h3 class="sec-h">Cleaning in this room</h3>
-          ${ts.map(t => taskRow(t, false)).join('') || '<p class="emptyline">No cleaning tasks here yet.</p>'}
+          <h3 class="sec-h">Tasks in this room</h3>
+          ${ts.map(t => taskRow(t, false)).join('') || '<p class="emptyline">No tasks here yet.</p>'}
           <div class="foot"><button class="btn sm" data-act="addTask" data-room="${sel.id}">+ Task</button></div>
           <h3 class="sec-h">Projects in this room</h3>
           ${ps.map(p => { const par = p.parentId && findP(p.parentId); return `<a class="ms" href="#project/${p.id}"><span style="font-weight:600"${p.status === 'done' ? ' class="done-t"' : ''}>${esc(p.name)}</span>${par ? `<span class="mut sm-t">Part of: ${esc(par.name)}</span>` : statusPill(p)}</a>`; }).join('') || '<p class="emptyline">No projects in this room.</p>'}
@@ -935,8 +1140,8 @@ function vRooms(id) {
   const n = data.rooms.length;
   return head(`${n} room${n === 1 ? '' : 's'}${floors.length ? ` · ${floors.length} floor${floors.length === 1 ? '' : 's'}` : ''}`, 'Rooms', `<button class="btn pri" data-act="addRoom">+ Room</button>`) +
     (floors.length > 1 ? `<div class="chips">${chip('all', 'All floors')}${floors.map(f => chip(f, f)).join('')}</div>` : '') +
-    (n ? `<section class="rgrid" aria-label="Rooms">${cards}</section>` : `<section class="card empty"><h2>No rooms yet</h2><p>Add the rooms in your house. Each room keeps its own info (sizes, paint, bulbs, filters) and shows its cleaning and projects.</p><div class="row-btns"><button class="btn pri" data-act="addRoom">+ Add a room</button></div></section>`) +
-    (sel ? detail : (n ? '<p class="sm-t mut">Tap a room to see its info, cleaning and projects.</p>' : ''));
+    (n ? `<section class="rgrid" aria-label="Rooms">${cards}</section>` : `<section class="card empty"><h2>No rooms yet</h2><p>Add the rooms in your house. Each room keeps its own info (sizes, paint, bulbs, filters) and shows its tasks and projects.</p><div class="row-btns"><button class="btn pri" data-act="addRoom">+ Add a room</button></div></section>`) +
+    (sel ? detail : (n ? '<p class="sm-t mut">Tap a room to see its info, tasks and projects.</p>' : ''));
 }
 function roomForm(r) {
   const isNew = !r;
@@ -959,29 +1164,212 @@ function roomForm(r) {
   });
 }
 
-/* ---------- More: backup + history ---------- */
-function vMore() {
+/* ---------- History ---------- */
+// Everything that has happened, built from the tasks and projects themselves.
+function events() {
   const ev = [];
-  data.tasks.forEach(t => t.history.forEach(d => ev.push({ d, kind: 'Cleaned', text: t.name, sub: roomName(t.roomId) })));
-  data.projects.forEach(p => p.updates.forEach(u => ev.push({ d: u.date || '', kind: 'Update', text: u.text, sub: p.name, href: '#project/' + p.id })));
-  ev.sort((a, b) => b.d.localeCompare(a.d));
-  const hist = ev.slice(0, 60).map(e => `<div class="hrow"><span class="d">${fmt(e.d)}</span><div style="min-width:0"><p style="font-weight:600;white-space:pre-line">${esc(e.text)}</p><p class="sm-t mut">${e.kind}${e.sub ? ' · ' + (e.href ? `<a href="${e.href}">${esc(e.sub)}</a>` : esc(e.sub)) : ''}</p></div></div>`).join('');
-  return head('Account, backup + history', 'More') + `
+  const add = e => ev.push({ at: null, by: null, room: '', href: '', ...e, d: e.d || (e.at ? dayOf(e.at) : '') });
+  data.tasks.forEach(t => {
+    if (isOneoff(t)) {
+      if (t.createdAt) add({ at: t.createdAt, by: t.createdBy, kind: 'todo', verb: 'added to-do', what: t.name, room: t.roomId, href: '#tasks' });
+      if (t.done && t.doneAt) add({ at: t.doneAt, by: t.doneBy, kind: 'todo', done: true, verb: 'finished', what: t.name, room: t.roomId, href: '#tasks' });
+      return;
+    }
+    const counted = {};
+    t.log.forEach(l => { counted[l.d] = (counted[l.d] || 0) + 1; add({ d: l.d, at: l.at, by: l.by, kind: 'cleaning', verb: 'did', what: t.name, room: t.roomId, href: '#tasks' }); });
+    t.history.forEach(d => { if (counted[d]) { counted[d]--; return; } add({ d, kind: 'cleaning', verb: 'did', what: t.name, room: t.roomId, href: '#tasks' }); });
+  });
+  data.projects.forEach(p => {
+    const href = '#project/' + p.id;
+    p.updates.forEach(u => add({ d: u.at ? dayOf(u.at) : u.date, at: u.at, by: u.by, kind: 'update', verb: 'posted on', what: p.name, quote: u.text, room: p.roomId, href }));
+    if (p.doneAt) add({ at: p.doneAt, by: p.doneBy, kind: 'update', verb: 'marked', what: p.name, tail: 'done', room: p.roomId, href, parent: p.parentId });
+    p.steps.forEach(s => { if (s.done && s.doneAt) add({ at: s.doneAt, by: s.doneBy, kind: 'step', verb: 'checked off step', what: s.text, tail: 'on ' + p.name, room: p.roomId, href }); });
+    p.parts.forEach(x => { if (x.have && x.haveAt) add({ at: x.haveAt, by: x.haveBy, kind: 'step', verb: 'got', what: x.name, tail: 'for ' + p.name, room: p.roomId, href }); });
+  });
+  return ev.filter(e => e.d).sort((a, b) => (b.d + (b.at || '')).localeCompare(a.d + (a.at || '')));
+}
+const KIND_LABEL = { cleaning: ['Cleaning', 'ok'], todo: ['To-do', 'info'], update: ['Project', 'neu'], step: ['Project', 'neu'] };
+const RANGES = { '1': 'Today', '7': 'Last 7 days', 'month': 'This month', '90': 'Last 3 months', 'all': 'All time', 'custom': 'Custom dates' };
+function rangeBounds(h) {
+  const t = todayISO();
+  if (h.range === '1') return [t, t];
+  if (h.range === '7') return [relDate(-6), t];
+  if (h.range === 'month') return [t.slice(0, 8) + '01', t];
+  if (h.range === '90') return [relDate(-89), t];
+  if (h.range === 'custom') return [h.from || '0000', h.to || '9999'];
+  return ['0000', '9999'];
+}
+function filteredEvents() {
+  const h = ui.hist, [from, to] = rangeBounds(h);
+  return events().filter(e => e.d >= from && e.d <= to && h.kinds.includes(e.kind)
+    && (h.who === 'all' || e.by === h.who) && (h.room === 'all' || e.room === h.room));
+}
+function evRow(e) {
+  // Entries from before names were tracked have no person: word them without one
+  const text = e.by
+    ? `<b>${esc(personName(e.by))}</b> ${esc(e.verb)} <b>${esc(e.what)}</b>${e.tail ? ' ' + esc(e.tail) : ''}${e.quote ? `: “${esc(e.quote)}”` : ''}`
+    : e.quote ? `Update on <b>${esc(e.what)}</b>: “${esc(e.quote)}”`
+    : `<b>${esc(e.what)}</b> ${e.kind === 'cleaning' ? 'done' : esc(e.verb)}`;
+  const [kl, kc] = KIND_LABEL[e.kind];
+  const meta = [roomName(e.room), fmtTime(e.at)].filter(Boolean).join(' · ');
+  return `<a class="ev" href="${e.href}">${avatar(e.by)}<div style="min-width:0"><p class="et">${text}</p><p class="es"><span class="kind p-${kc}">${kl}</span>${esc(meta)}</p></div></a>`;
+}
+function weekSummary() {
+  const from = relDate(-6), ev = events().filter(e => e.d >= from);
+  const tasks = ev.filter(e => e.kind === 'cleaning').length, todos = ev.filter(e => e.kind === 'todo' && e.done).length, ups = ev.filter(e => e.kind === 'update').length;
+  const people = data.members.slice().sort((a, b) => (a.id === me() ? -1 : b.id === me() ? 1 : 0));
+  const counted = ev.filter(e => e.by && (e.kind !== 'todo' || e.done));
+  const counts = people.map(m => [m, counted.filter(e => e.by === m.id).length]);
+  const total = counts.reduce((a, [, n]) => a + n, 0);
+  const splitBar = people.length > 1 && total ? `<div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+      <div class="split-bar" role="img" aria-label="${esc(counts.map(([m, n]) => `${personName(m.id)} ${n}`).join(', '))}">${counts.map(([m, n]) => `<div style="width:${n / total * 100}%;background:${m.id === me() ? 'var(--accent)' : 'var(--info)'}"></div>`).join('')}</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600">${counts.map(([m, n]) => `<span style="color:${m.id === me() ? 'var(--accent-ink)' : 'var(--info)'}">${esc(personName(m.id))} · ${n}</span>`).join('')}</div></div>` : '';
+  return `<section class="card" style="padding:18px 20px" aria-label="This week">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:16px;font-weight:700">Last 7 days</h2><span class="sm-t mut">${fmt(from)} – ${fmt(todayISO())}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px">
+      <div><p style="font-size:24px;font-weight:700">${tasks}</p><p class="sm-t mut" style="font-size:12px">Tasks done</p></div>
+      <div><p style="font-size:24px;font-weight:700">${todos}</p><p class="sm-t mut" style="font-size:12px">To-dos done</p></div>
+      <div><p style="font-size:24px;font-weight:700">${ups}</p><p class="sm-t mut" style="font-size:12px">Project updates</p></div>
+    </div>${splitBar}</section>`;
+}
+function vHistory() {
+  const h = ui.hist;
+  const seg = `<div class="seg" role="radiogroup" aria-label="View">
+    <button role="radio" aria-checked="${h.view === 'list'}" data-act="histView" data-v="list"><span style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>List</span></button>
+    <button role="radio" aria-checked="${h.view === 'grid'}" data-act="histView" data-v="grid"><span style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>Grid · recurring</span></button>
+  </div>`;
+  const whoLabel = h.who === 'all' ? (data.members.length > 1 ? 'Both of us' : 'Everyone') : personName(h.who);
+  const roomLabel = h.room === 'all' ? 'All rooms' : (roomName(h.room) || 'Room');
+  const filterIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>';
+  const quick = `<div class="chips"><button class="chip soft" data-act="histFilters">${filterIcon}Filters</button>
+    ${h.view === 'list' ? `<button class="chip" data-act="histFilters">${esc(h.range === 'custom' ? `${fmt(h.from)} – ${fmt(h.to)}` : RANGES[h.range])} ▾</button>` : ''}
+    <button class="chip" data-act="histFilters">${esc(whoLabel)} ▾</button><button class="chip" data-act="histFilters">${esc(roomLabel)} ▾</button></div>`;
+  const kindsPreset = { all: ['cleaning', 'todo', 'update', 'step'], cleaning: ['cleaning'], todo: ['todo'], projects: ['update', 'step'] };
+  const same = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+  const typeChips = `<div class="chips">${[['all', 'Everything'], ['cleaning', 'Cleaning'], ['todo', 'To-dos'], ['projects', 'Projects']].map(([k, l]) => `<button class="chip${same(h.kinds, kindsPreset[k]) ? ' on' : ''}" data-act="histKinds" data-v="${k}">${l}</button>`).join('')}</div>`;
+  const top = head('Everything you\'ve done', 'History') + weekSummary() + seg + quick;
+  if (h.view === 'grid') return top + gridView();
+  const ev = filteredEvents();
+  let body = '', last = '';
+  ev.slice(0, h.limit).forEach(e => {
+    if (e.d !== last) { body += `<h3 class="day">${esc(dayLabel(e.d))}</h3>`; last = e.d; }
+    body += evRow(e);
+  });
+  return top + typeChips + `<section class="card clip">
+    ${body || '<p class="emptyline" style="border:0">Nothing here for these filters yet. Finished tasks, to-dos and project work show up here.</p>'}
+    ${ev.length > h.limit ? `<div class="foot"><button class="chip" style="width:100%;justify-content:center" data-act="histMore">Show older (${ev.length - h.limit} more)</button></div>` : ''}
+  </section>`;
+}
+function historyFilterSheet() {
+  const h = ui.hist;
+  const r = (name, val, label, cur) => `<label class="chip"><input type="radio" class="vh" name="${name}" value="${esc(val)}"${cur === val ? ' checked' : ''}>${esc(label)}</label>`;
+  const k = (val, label) => `<label><input type="checkbox" class="chk" name="kinds" value="${val}"${h.kinds.includes(val) ? ' checked' : ''}>${label}</label>`;
+  const people = data.members.slice().sort((a, b) => (a.id === me() ? -1 : b.id === me() ? 1 : 0));
+  const d = $('#dlg');
+  d.innerHTML = `<form id="hform" class="dform" novalidate>
+    <div class="dhead"><h2 id="dtitle">Filter history</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dbody">
+      <div class="fsec"><h3>When</h3><div class="chips">${Object.entries(RANGES).map(([v, l]) => r('range', v, l, h.range)).join('')}</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+          <div class="fld"><label for="hFrom">From</label><input id="hFrom" type="date" name="from" value="${esc(h.from || relDate(-6))}"></div>
+          <div class="fld"><label for="hTo">To</label><input id="hTo" type="date" name="to" value="${esc(h.to || todayISO())}"></div>
+        </div><p class="hint" style="margin-top:-4px">From/To are used when "Custom dates" is picked. The grid view always shows one week at a time.</p></div>
+      <div class="fsec"><h3>Who</h3><div class="chips">${r('who', 'all', people.length > 1 ? 'Both of us' : 'Everyone', h.who)}${people.map(m => r('who', m.id, personName(m.id), h.who)).join('')}</div></div>
+      <div class="fsec"><h3>What</h3><div class="ckrow">${k('cleaning', 'Cleaning')}${k('todo', 'To-dos')}${k('update', 'Project updates')}${k('step', 'Steps + parts')}</div></div>
+      <div class="fsec"><div class="fld"><label for="hRoom" style="font-size:14px;font-weight:700;color:var(--ink)">Room</label><select id="hRoom" name="room"><option value="all">All rooms</option>${data.rooms.map(rm => `<option value="${rm.id}"${h.room === rm.id ? ' selected' : ''}>${esc(rm.name)}</option>`).join('')}</select></div></div>
+    </div>
+    <div class="dact"><button type="button" class="btn" data-act="histReset">Reset</button><span class="sp"></span><button type="submit" class="btn pri" id="hApply">Show results</button></div>
+  </form>`;
+  d.showModal();
+  updateFilterCount();
+}
+function readFilterForm(f) {
+  return { range: (f.querySelector('[name=range]:checked') || {}).value || '7', from: f.elements.from.value, to: f.elements.to.value,
+    who: (f.querySelector('[name=who]:checked') || {}).value || 'all', kinds: [...f.querySelectorAll('[name=kinds]:checked')].map(x => x.value), room: f.elements.room.value };
+}
+function updateFilterCount() {
+  const f = $('#hform'); if (!f) return;
+  const saved = ui.hist; ui.hist = { ...saved, ...readFilterForm(f) };
+  const n = filteredEvents().length; ui.hist = saved;
+  $('#hApply').textContent = `Show ${n} entr${n === 1 ? 'y' : 'ies'}`;
+}
+
+/* grid: one row per recurring task, one column per day */
+function weekDays(off) {
+  const t = new Date(); const s = new Date(t.getFullYear(), t.getMonth(), t.getDate() - t.getDay() - 7 * off);
+  return [...Array(7)].map((_, i) => iso(new Date(s.getFullYear(), s.getMonth(), s.getDate() + i)));
+}
+function doneOn(t, d) {
+  const l = t.log.filter(x => x.d === d);
+  if (l.length) return l[l.length - 1];
+  return t.history.includes(d) || t.lastDone === d ? { d, at: null, by: null } : null;
+}
+function cellState(t, d, today) {
+  if (d > today) return { s: 'fut' };
+  const dn = doneOn(t, d);
+  if (dn) return { s: 'done', e: dn };
+  const prior = [...t.history, t.lastDone].filter(x => x && x < d).sort().pop();
+  if (!prior) return { s: 'none' };
+  const due = addEvery(prior, t.every);
+  if (d < due) return { s: 'none' };
+  if (d === due && d === today) return { s: 'today' };
+  return { s: 'od', due };
+}
+function gridView() {
+  const h = ui.hist, days = weekDays(h.week), today = todayISO();
+  const rec = data.tasks.filter(t => !isOneoff(t) && (h.room === 'all' || t.roomId === h.room));
+  if (!rec.length) return `<section class="card empty"><h2>No recurring tasks${h.room !== 'all' ? ' in this room' : ''}</h2><p>The grid shows recurring tasks only — one row each, one square per day.</p></section>`;
+  let done = 0, od = 0;
+  const cell = (t, d) => {
+    const c = cellState(t, d, today);
+    if (c.s === 'fut') return '<span class="c fut" aria-hidden="true"></span>';
+    const dl = `${WD[parseD(d).getDay()]} ${fmt(d)}`;
+    if (c.s === 'done') {
+      const by = c.e.by, dim = h.who !== 'all' && by !== h.who;
+      if (!dim) done++;
+      const cls = dim ? 'done-dim' : by ? (by === me() ? 'done-me' : 'done-other') : 'done-unk';
+      const msg = `${t.name}: done ${dl}${by ? ' by ' + personName(by, { you: 'you' }) : ''}${c.e.at ? ' at ' + fmtTime(c.e.at) : ''}`;
+      return `<button class="c ${cls}" data-act="cell" data-msg="${esc(msg)}" aria-label="${esc(msg)}">${esc(initial(by))}</button>`;
+    }
+    if (c.s === 'od') { if (d === today) od++; const msg = `${t.name}: overdue ${dl} (was due ${fmt(c.due)})`; return `<button class="c od" data-act="cell" data-msg="${esc(msg)}" aria-label="${esc(msg)}"></button>`; }
+    if (c.s === 'today') { const msg = `${t.name}: due today`; return `<button class="c today" data-act="cell" data-msg="${esc(msg)}" aria-label="${esc(msg)}"></button>`; }
+    return `<span class="c" style="cursor:default" aria-hidden="true"></span>`;
+  };
+  const row = t => `<div class="g"><span class="tn">${esc(t.name)}<span class="ts">${esc(everyText(t.every))}</span></span>${days.map(d => cell(t, d)).join('')}</div>`;
+  const groups = data.rooms.map(r => [r.name, rec.filter(t => t.roomId === r.id)]);
+  groups.push(['No room', rec.filter(t => !data.rooms.some(r => r.id === t.roomId))]);
+  const rows = groups.filter(g => g[1].length).map(([n, ts]) => `<h3 class="room">${esc(n)}</h3>${ts.map(row).join('')}`).join('');
+  const people = data.members.slice().sort((a, b) => (a.id === me() ? -1 : b.id === me() ? 1 : 0));
+  const legend = `<div class="legend">${people.map(m => `<span><span class="c ${m.id === me() ? 'done-me' : 'done-other'}">${esc(initial(m.id))}</span>${esc(personName(m.id))}</span>`).join('')}
+    <span><span class="c od"></span>Overdue</span><span><span class="c today"></span>Due today</span></div>`;
+  const head7 = `<div class="g gh"><span></span>${days.map(d => { const dt = parseD(d); return `<span class="${d === today ? 'today' : ''}">${'SMTWTFS'[dt.getDay()]}<br>${dt.getDate()}</span>`; }).join('')}</div>`;
+  const label = `${fmt(days[0])} – ${fmt(days[6])}`;
+  const summary = h.week === 0 ? `This week · ${done} done${od ? ` · ${od} overdue now` : ''}` : `${done} done that week`;
+  return `<section class="card clip gridcard">
+    <div class="wknav"><button data-act="gridWeek" data-v="1" aria-label="Previous week">‹</button>
+      <div style="text-align:center"><p style="font-size:15px;font-weight:700">${label}</p><p class="mut" style="font-size:12px;margin-top:2px">${summary}</p></div>
+      <button data-act="gridWeek" data-v="-1" aria-label="Next week"${h.week === 0 ? ' disabled' : ''}>›</button></div>
+    ${head7}${rows}${legend}
+  </section>
+  <p class="sm-t mut">Tap a square to see who did it and when. One-off to-dos and project work stay in List view.</p>`;
+}
+
+/* ---------- Settings ---------- */
+function vSettings() {
+  const m = myMember();
+  return `<a class="back" href="#today">← Today</a>` + head('Account + backup', 'Settings') + `
   <section class="card clip">
-    <div class="hd"><h2>Account</h2><button class="btn sm" data-act="signOut">Sign out</button></div>
-    <p class="sm-t mut" style="padding:0 20px 18px;line-height:1.55">Signed in as <b style="color:var(--ink)">${esc(user.email)}</b>. Everything here is shared live with your household.</p>
+    <div class="hd"><h2>You</h2><button class="btn sm" data-act="editName">${m && m.name ? 'Change name' : 'Set your name'}</button></div>
+    <div style="padding:0 20px 18px;display:flex;align-items:center;gap:12px">${avatar(me())}<div><p style="font-weight:700">${esc((m && m.name) || 'No name yet')}</p><p class="sm-t mut">${esc(user.email)}</p></div></div>
+    <div class="foot" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span class="sm-t mut">Everything here is shared live with your household.</span><button class="btn sm" data-act="signOut">Sign out</button></div>
   </section>
   <section class="card clip">
     <div class="hd"><h2>Backup</h2></div>
     <div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:12px">
-      <p class="sm-t mut" style="line-height:1.55">Your data is stored in your shared Homebase and synced to both phones. A JSON backup now and then (save it to Files, iCloud or Google Drive) is still a good safety net.</p>
-      <p class="sm-t"><b>Last backup:</b> ${data.lastExport ? fmt(data.lastExport.slice(0, 10)) : 'never'}</p>
+      <p class="sm-t mut" style="line-height:1.55">Homebase is stored in your shared Firebase database. A JSON backup (save it to Files, iCloud or Google Drive) is a safety net if something gets deleted by mistake.</p>
+      <p class="sm-t"><b>Last backup:</b> ${data.lastExport ? fmt(dayOf(data.lastExport)) : 'never'}</p>
       <div class="row-btns" style="margin:0"><button class="btn pri" data-act="export">Export backup (.json)</button><button class="btn" data-act="import">Restore from backup</button></div>
     </div>
-  </section>
-  <section class="card clip">
-    <div class="hd"><h2>History</h2></div>
-    ${hist || '<p class="emptyline">Finished cleaning tasks and project updates show up here.</p>'}
   </section>
   <section class="card clip">
     <div class="hd"><h2>Start over</h2></div>
@@ -992,7 +1380,7 @@ async function exportData() {
   const json = JSON.stringify(data, null, 2);
   const name = `homebase-backup-${todayISO()}.json`;
   const file = new File([json], name, { type: 'application/json' });
-  const mark = () => { data.lastExport = new Date().toISOString(); commit(); toast('Backup saved'); };
+  const mark = () => { data.lastExport = nowISO(); commit(); toast('Backup saved'); };
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: 'Homebase backup' });
@@ -1010,18 +1398,20 @@ async function importFile(file) {
   try { obj = JSON.parse(await file.text()); } catch { alert("That file isn't a Homebase backup (couldn't read it)."); return; }
   if (!obj || !Array.isArray(obj.tasks) || !Array.isArray(obj.projects) || !Array.isArray(obj.rooms)) { alert("That file isn't a Homebase backup."); return; }
   if (hasData() && !confirm(`Replace everything in Homebase (for everyone) with this backup?\n\n${obj.rooms.length} rooms · ${obj.tasks.length} tasks · ${obj.projects.length} projects`)) return;
-  data = normalize(obj);
+  data = normalize({ ...obj, members: data.members });
   commit(); location.hash = '#today'; toast('Backup restored');
 }
 function sampleData() {
   const r = n => ({ id: uid(), name: n[0], floor: n[1], info: [] });
   const R = { kit: r(['Kitchen', 'Main floor']), liv: r(['Living room', 'Main floor']), hall: r(['Hallway + entry', 'Main floor']), bed: r(['Primary bedroom', 'Upstairs']), nur: r(['Nursery', 'Upstairs']), bath: r(['Bathrooms', 'Upstairs']), lau: r(['Laundry', 'Basement']), gar: r(['Garage', 'Outside']), yard: r(['Yard + deck', 'Outside']) };
   R.kit.info.push({ id: uid(), label: 'Floor size', value: `12' 4" × 14' 0"` }, { id: uid(), label: 'Pot lights', value: '6 × 4" LED, 3000K' }, { id: uid(), label: 'Range hood filter', value: '[size / part #]' });
-  const t = (name, room, n, unit, ago, notes = '') => { const last = relDate(-ago); return { id: uid(), name, roomId: room.id, every: { n, unit }, lastDone: last, history: [relDate(-ago - (unit === 'day' ? n : unit === 'week' ? 7 * n : 30 * n)), last], notes }; };
+  const t = (name, room, n, unit, ago, notes = '') => { const last = relDate(-ago); const prev = relDate(-ago - (unit === 'day' ? n : unit === 'week' ? 7 * n : 30 * n)); return { id: uid(), type: 'recurring', name, roomId: room.id, every: { n, unit }, lastDone: last, history: [prev, last], log: [], notes }; };
   const tasks = [
     t('Wipe stovetop + range hood filter', R.kit, 2, 'week', 16), t('Sanitize bottle station', R.kit, 1, 'day', 1), t('Clean out fridge', R.kit, 1, 'week', 5),
     t('Vacuum main floor', R.liv, 3, 'day', 3), t('Change bed sheets', R.bed, 1, 'week', 7), t('Scrub tub + shower glass', R.bath, 1, 'week', 6),
     t('Deep clean litter boxes', R.lau, 1, 'week', 8), t('Replace furnace filter', R.lau, 3, 'month', 65, 'Filter size: [16×25×1]'), t('Take out recycling', R.gar, 1, 'week', 7),
+    { id: uid(), type: 'oneoff', name: 'Book the chimney sweep', roomId: R.liv.id, due: upcomingSaturday(), done: false, createdAt: nowISO(), createdBy: me(), notes: '' },
+    { id: uid(), type: 'oneoff', name: 'Return library books', roomId: '', due: '', done: false, createdAt: nowISO(), createdBy: me(), notes: '' },
   ];
   const s = (text, done = false) => ({ id: uid(), text, done });
   const P = (o) => ({ id: uid(), kind: 'regular', status: 'planning', roomId: '', description: '', budget: null, startDate: relDate(-14), targetDate: '', parentId: null, group: '', steps: [], measurements: [], parts: [], updates: [], quick: [], groups: [], updatedAt: relDate(-3), ...o });
@@ -1043,7 +1433,7 @@ function sampleData() {
     sub('Clear out the garage', 'Declutter + staging', { status: 'in-progress', roomId: R.gar.id, steps: [s('Sort keep / donate / dump', true), s('Dump run'), s('Donation drop-off')] }),
     sub('Pre-listing home inspection', 'Paperwork + agent', { budget: 500 }),
   ];
-  return normalize({ rooms: Object.values(R), tasks, projects: [shelf, blinds, sell, ...subs] });
+  return normalize({ rooms: Object.values(R), tasks, projects: [shelf, blinds, sell, ...subs], members: data.members, lastExport: data.lastExport });
 }
 
 /* ---------- forms (dialog) ---------- */
@@ -1059,17 +1449,17 @@ function fieldHTML(f, v) {
     input = `<input id="${id}" name="${f.key}" type="${t}"${t === 'number' ? ` inputmode="decimal" step="any"${f.min != null ? ` min="${f.min}"` : ''}` : ''} value="${esc(v ?? '')}" placeholder="${esc(f.placeholder || '')}"${list} autocomplete="off">` +
       (f.list ? `<datalist id="dl_${f.key}">${f.list.map(x => `<option value="${esc(x)}"></option>`).join('')}</datalist>` : '');
   }
-  return `<div class="fld${f.half ? ' half' : ''}"><label for="${id}">${esc(f.label)}${f.required ? '' : ''}</label>${input}</div>`;
+  return `<div class="fld${f.half ? ' half' : ''}"><label for="${id}">${esc(f.label)}</label>${input}</div>`;
 }
 function openForm(cfg) {
   formCtx = cfg;
   const d = $('#dlg');
-  d.innerHTML = `<form id="dform" novalidate>
+  d.innerHTML = `<form id="dform" class="dform" novalidate>
     <div class="dhead"><h2 id="dtitle">${esc(cfg.title)}</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
-    <div class="dbody">${cfg.fields.map(f => fieldHTML(f, (cfg.values || {})[f.key])).join('')}${cfg.extra || ''}</div>
-    <div class="dact">${cfg.onDelete ? '<button type="button" class="btn danger" data-del>Delete</button>' : ''}<span class="sp"></span><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn pri">Save</button></div>
+    <div class="dbody">${cfg.prefix || ''}${cfg.fields.map(f => fieldHTML(f, (cfg.values || {})[f.key])).join('')}${cfg.extra || ''}</div>
+    <div class="dact">${cfg.onDelete ? '<button type="button" class="btn danger" data-del>Delete</button>' : ''}<span class="sp"></span><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn pri">${esc(cfg.saveLabel || 'Save')}</button></div>
   </form>`;
-  d.showModal();
+  if (!d.open) d.showModal();
   const coarse = matchMedia('(pointer:coarse)').matches;
   if (!coarse) { const first = d.querySelector('.dbody input:not([type=checkbox]),.dbody textarea'); if (first) first.focus(); }
 }
@@ -1077,6 +1467,13 @@ const closeDlg = () => { const d = $('#dlg'); if (d.open) d.close(); formCtx = n
 
 document.addEventListener('submit', e => {
   if (e.target.id === 'loginForm') { e.preventDefault(); doLogin(e.target); return; }
+  if (e.target.id === 'hform') {
+    e.preventDefault();
+    const v = readFilterForm(e.target);
+    if (!v.kinds.length) v.kinds = HIST_DEFAULT().kinds;
+    Object.assign(ui.hist, v, { limit: 60 });
+    closeDlg(); render(); return;
+  }
   if (e.target.id !== 'dform') return;
   e.preventDefault();
   const cfg = formCtx, fm = e.target, vals = {};
@@ -1101,15 +1498,40 @@ document.addEventListener('click', e => {
     if (cfg && confirm(cfg.deleteMsg || "Delete this? This can't be undone.")) { cfg.onDelete(); closeDlg(); commit(); }
     return;
   }
+  const tt = e.target.closest('[data-ttype]');
+  if (tt) {   // switch Repeats / One-off in the new-task form, keeping what was typed
+    const fm = $('#dform');
+    const keep = { name: fm.elements.name.value, roomId: fm.elements.roomId.value, notes: fm.elements.notes.value, type: tt.dataset.ttype };
+    taskForm(null, keep); return;
+  }
+  const sd = e.target.closest('[data-setdue]');
+  if (sd) { const inp = $('#f_due'); if (inp) inp.value = sd.dataset.setdue; return; }
   const el = e.target.closest('[data-act]'); if (!el) return;
   const d = el.dataset, T = () => data.tasks.find(x => x.id === d.id);
   switch (d.act) {
     case 'set': ui[d.k] = d.v; render(); break;
     case 'toggleSubs': ui.showSubs = !ui.showSubs; render(); break;
-    case 'addTask': taskForm(null, { roomId: d.room || '' }); break;
+    case 'addTask': taskForm(null, { roomId: d.room || '', type: d.type }); break;
     case 'editTask': taskForm(T()); break;
-    case 'doneTask': { const t = T(); const td = todayISO(); t.prevLast = t.lastDone; t.lastDone = td; t.history.push(td); commit(); toast('Nice work'); break; }
-    case 'undoTask': { const t = T(); if (t.history[t.history.length - 1] === todayISO()) t.history.pop(); t.lastDone = t.prevLast !== undefined ? t.prevLast : (t.history[t.history.length - 1] || null); delete t.prevLast; commit(); break; }
+    case 'doneTask': {
+      const t = T(); const td = todayISO();
+      t.prevLast = t.lastDone; t.lastDone = td; t.history.push(td); t.log.push({ d: td, at: nowISO(), by: me() });
+      commit(); toast('Nice work'); break;
+    }
+    case 'undoTask': {
+      const t = T(); const td = todayISO();
+      if (t.history[t.history.length - 1] === td) t.history.pop();
+      const li = t.log.map(x => x.d).lastIndexOf(td); if (li >= 0) t.log.splice(li, 1);
+      t.lastDone = t.prevLast !== undefined ? t.prevLast : ([...t.history].sort().pop() || null); delete t.prevLast;
+      commit(); break;
+    }
+    case 'toggleTodo': {
+      const t = T(); t.done = !t.done;
+      t.doneAt = t.done ? nowISO() : null; t.doneBy = t.done ? me() : null;
+      commit(); if (t.done) toast('Nice work'); break;
+    }
+    case 'dismissBanner': markSeen(); break;
+    case 'viewNew': markSeen(); ui.taskFilter = 'todo'; location.hash = '#tasks'; break;
     case 'addProject': projectForm(null); break;
     case 'addSub': projectForm(null, { parentId: d.id, group: d.group || '' }); break;
     case 'editProject': projectForm(findP(d.id)); break;
@@ -1120,13 +1542,24 @@ document.addEventListener('click', e => {
     case 'toggle': {
       const o = owner(d.kind, d.pid); const it = o && o[d.kind].find(x => x.id === d.iid); if (!it) break;
       it[d.field] = !it[d.field];
+      if (d.kind === 'steps') { it.doneAt = it.done ? nowISO() : null; it.doneBy = it.done ? me() : null; }
+      if (d.kind === 'parts') { it.haveAt = it.have ? nowISO() : null; it.haveBy = it.have ? me() : null; }
       if (d.kind === 'steps' && it.done && o.status === 'planning') o.status = 'in-progress';
       touch(o); commit(); break;
     }
     case 'postUpdate': postUpdate(d.pid); break;
     case 'addRoom': roomForm(null); break;
     case 'editRoom': roomForm(data.rooms.find(r => r.id === d.id)); break;
+    case 'histView': ui.hist.view = d.v; render(); break;
+    case 'histFilters': historyFilterSheet(); break;
+    case 'histReset': { const keep = { view: ui.hist.view, week: ui.hist.week }; ui.hist = { ...HIST_DEFAULT(), ...keep }; closeDlg(); render(); break; }
+    case 'histKinds': ui.hist.kinds = { all: ['cleaning', 'todo', 'update', 'step'], cleaning: ['cleaning'], todo: ['todo'], projects: ['update', 'step'] }[d.v]; ui.hist.limit = 60; render(); break;
+    case 'histMore': ui.hist.limit += 60; render(); break;
+    case 'gridWeek': ui.hist.week = Math.max(0, ui.hist.week + Number(d.v)); render(); break;
+    case 'cell': toast(d.msg); break;
+    case 'editName': nameForm(false); break;
     case 'export': exportData(); break;
+    case 'import': $('#importFile').click(); break;
     case 'signOut': if (confirm('Sign out of Homebase on this device?')) signOut(auth); break;
     case 'resetPw': {
       const em = ($('#lEmail') || {}).value?.trim();
@@ -1134,19 +1567,18 @@ document.addEventListener('click', e => {
       sendPasswordResetEmail(auth, em).then(() => { $('#lErr').textContent = 'Check your email for a reset link.'; }).catch(() => { $('#lErr').textContent = 'Could not send a reset email to that address.'; });
       break;
     }
-    case 'import': $('#importFile').click(); break;
     case 'sample':
       if (hasData() && !confirm('Replace everything (for everyone) with sample data?')) break;
-      data = normalize(sampleData()); commit(); location.hash = '#today'; toast('Sample data loaded'); break;
+      data = sampleData(); commit(); location.hash = '#today'; toast('Sample data loaded'); break;
     case 'erase':
-      if (confirm('Erase everything in Homebase? This erases it for everyone in your household.') && confirm("Last check — this can't be undone. Erase?")) { data = normalize({}); commit(); location.hash = '#today'; }
+      if (confirm('Erase everything in Homebase? This erases it for everyone in your household.') && confirm("Last check — this can't be undone. Erase?")) { data = normalize({ members: data.members, lastExport: data.lastExport }); commit(); location.hash = '#today'; }
       break;
   }
 });
 function postUpdate(pid) {
   const inp = $('#updText'), p = findP(pid);
   if (!inp || !p || !inp.value.trim()) return;
-  p.updates.push({ id: uid(), date: todayISO(), text: inp.value.trim() });
+  p.updates.push({ id: uid(), date: todayISO(), text: inp.value.trim(), at: nowISO(), by: me() });
   if (p.status === 'planning') p.status = 'in-progress';
   touch(p); commit();
 }
@@ -1156,6 +1588,10 @@ document.addEventListener('keydown', e => {
 document.addEventListener('change', e => {
   if (e.target.dataset.change) { ui[e.target.dataset.change] = e.target.value; render(); }
   if (e.target.id === 'importFile' && e.target.files[0]) { importFile(e.target.files[0]); e.target.value = ''; }
+  if (e.target.closest('#hform')) {
+    if (e.target.name === 'from' || e.target.name === 'to') { const c = $('#hform [name=range][value=custom]'); if (c) c.checked = true; }
+    updateFilterCount();
+  }
 });
 $('#dlg').addEventListener('close', () => { formCtx = null; setTimeout(flushRender, 0); });
 document.addEventListener('focusout', e => { if (e.target.id === 'updText') setTimeout(flushRender, 0); });
