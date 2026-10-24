@@ -126,7 +126,11 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.stat{padding:18px 20px}
+.stat{padding:18px 20px;text-align:left;cursor:pointer;font:inherit;color:inherit;display:block;width:100%;position:relative}
+.stat:hover{border-color:#C8D2CE}
+.stat .go{position:absolute;top:16px;right:16px;color:var(--muted)}
+.sheetlist{border-top:1px solid var(--line2);margin:0 -20px}
+.sheetlist .trow:first-child,.sheetlist .ev:first-child{border-top:0}
 .stat p:first-child{font-size:13px;color:var(--muted);font-weight:500}
 .stat p:last-child{margin-top:6px;font-size:28px;font-weight:700}
 
@@ -411,7 +415,7 @@ function commit() { save(); render(); }
 // Live updates from the other phone: wait if a form is open or an update is being typed.
 function scheduleRender() {
   const a = document.activeElement;
-  if ($('#dlg').open || (a && a.id === 'updText' && a.value)) { pendingRender = true; return; }
+  if (($('#dlg').open && !statOpen) || (a && a.id === 'updText' && a.value)) { pendingRender = true; return; }
   render();
 }
 function flushRender() { if (pendingRender) { pendingRender = false; render(); } }
@@ -682,6 +686,7 @@ function render() {
   const { v, id } = route();
   const fn = VIEWS[v] || vToday;
   $('#view').innerHTML = fn(id);
+  if (statOpen && $('#dlg').open) openStatSheet(statOpen);
   const tab = v === 'project' ? 'projects' : (VIEWS[v] ? v : 'today');
   document.querySelectorAll('.nav').forEach(a => {
     const on = a.dataset.tab === tab;
@@ -779,10 +784,10 @@ function vToday() {
   const active = data.projects.filter(p => !isBig(p) && p.status === 'in-progress');
   return head(kicker, 'Today', acts) + bannerHTML() + dueBannerHTML() + `
   <section class="stats" aria-label="Summary">
-    <div class="card stat"><p>Due today</p><p>${due.length - overdue}</p></div>
-    <div class="card stat"><p>Overdue</p><p style="color:${overdue ? 'var(--danger)' : 'inherit'}">${overdue}</p></div>
-    <div class="card stat"><p>Done this week</p><p>${doneWeek}</p></div>
-    <div class="card stat"><p>Active projects</p><p>${activeCount}</p></div>
+    <button class="card stat" data-act="statSheet" data-v="today" aria-label="Due today: ${due.length - overdue}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Due today</p><p>${due.length - overdue}</p></button>
+    <button class="card stat" data-act="statSheet" data-v="overdue" aria-label="Overdue: ${overdue}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Overdue</p><p style="color:${overdue ? 'var(--danger)' : 'inherit'}">${overdue}</p></button>
+    <button class="card stat" data-act="statSheet" data-v="week" aria-label="Done this week: ${doneWeek}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Done this week</p><p>${doneWeek}</p></button>
+    <button class="card stat" data-act="statSheet" data-v="projects" aria-label="Active projects: ${activeCount}. Show list"><svg class="go" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><p>Active projects</p><p>${activeCount}</p></button>
   </section>
   <div class="split">
     <section class="card clip" style="flex:3 1 440px;min-width:0">
@@ -1497,7 +1502,53 @@ function fieldHTML(f, v) {
   }
   return `<div class="fld${f.half ? ' half' : ''}"><label for="${id}">${esc(f.label)}</label>${input}</div>`;
 }
+/* ---------- Today summary cards → list sheet ---------- */
+let statOpen = null;   // which summary list is open, so it refreshes after ticking things off
+function statSheetHTML(kind) {
+  const t = todayISO();
+  const open = data.tasks.filter(x => isOpen(x) && !doneToday(x));
+  const byDue = (a, b) => (nextDue(a) || '').localeCompare(nextDue(b) || '');
+  let title, body;
+  if (kind === 'today') {
+    const list = open.filter(x => dueInfo(x).d === 0).sort(byDue), done = data.tasks.filter(doneToday);
+    title = 'Due today';
+    body = list.map(x => taskRow(x)).join('') + (done.length ? `<h3 class="grp" style="border-top:1px solid var(--line)">Done today · ${done.length}</h3>` + done.map(x => taskRow(x)).join('') : '');
+    if (!list.length && !done.length) body = '<p class="emptyline" style="border:0">Nothing due today.</p>';
+    else if (!list.length) body = '<p class="emptyline" style="border:0">All caught up for today.</p>' + body;
+  } else if (kind === 'overdue') {
+    const list = open.filter(x => dueInfo(x).d < 0).sort(byDue);
+    title = 'Overdue';
+    body = list.map(x => taskRow(x)).join('') || '<p class="emptyline" style="border:0">Nothing overdue. Nice.</p>';
+  } else if (kind === 'week') {
+    const from = relDate(-6);
+    const ev = events().filter(e => e.d >= from && (e.kind === 'cleaning' || (e.kind === 'todo' && e.done)));
+    title = 'Done this week';
+    let last = ''; body = '';
+    ev.forEach(e => { if (e.d !== last) { body += `<h3 class="day">${esc(dayLabel(e.d))}</h3>`; last = e.d; } body += evRow(e); });
+    body = body || '<p class="emptyline" style="border:0">Nothing finished in the last 7 days yet.</p>';
+  } else {
+    const list = data.projects.filter(p => !p.parentId && p.status !== 'done');
+    title = 'Active projects';
+    body = list.map(p => { const pr = progress(p); return `<a class="ms" href="#project/${p.id}" style="flex-wrap:nowrap"><span style="min-width:0;flex:1"><span style="font-weight:600;display:block">${esc(p.name)}</span><span class="mut" style="font-size:12px">${isBig(p) ? kids(p).length + ' sub-projects' : (roomName(p.roomId) || STATUS[p.status][0])}</span></span><span style="width:70px;flex:none">${bar(pr)}</span><b style="font-size:13px;width:36px;text-align:right">${pr}%</b></a>`; }).join('')
+      || '<p class="emptyline" style="border:0">No active projects.</p>';
+  }
+  return { title, body };
+}
+function openStatSheet(kind) {
+  statOpen = kind; formCtx = null;
+  const { title, body } = statSheetHTML(kind), d = $('#dlg');
+  const go = kind === 'week' ? '#history' : kind === 'projects' ? '#projects' : '#tasks';
+  const goLabel = kind === 'week' ? 'Open History' : kind === 'projects' ? 'All projects' : 'All tasks';
+  d.innerHTML = `<div class="dform">
+    <div class="dhead"><h2 id="dtitle">${esc(title)}</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>
+    <div class="dbody" style="display:block;padding-top:0"><div class="sheetlist">${body}</div></div>
+    <div class="dact"><a class="btn" href="${go}">${goLabel}</a><span class="sp"></span><button type="button" class="btn pri" data-close>Close</button></div>
+  </div>`;
+  if (!d.open) d.showModal();
+}
+
 function openForm(cfg) {
+  statOpen = null;
   formCtx = cfg;
   const d = $('#dlg');
   d.innerHTML = `<form id="dform" class="dform" novalidate>
@@ -1509,7 +1560,7 @@ function openForm(cfg) {
   const coarse = matchMedia('(pointer:coarse)').matches;
   if (!coarse) { const first = d.querySelector('.dbody input:not([type=checkbox]),.dbody textarea'); if (first) first.focus(); }
 }
-const closeDlg = () => { const d = $('#dlg'); if (d.open) d.close(); formCtx = null; };
+const closeDlg = () => { const d = $('#dlg'); if (d.open) d.close(); formCtx = null; statOpen = null; };
 
 document.addEventListener('submit', e => {
   if (e.target.id === 'loginForm') { e.preventDefault(); doLogin(e.target); return; }
@@ -1579,6 +1630,7 @@ document.addEventListener('click', e => {
     case 'dismissBanner': markSeen(); break;
     case 'viewNew': markSeen(); ui.taskFilter = 'todo'; location.hash = '#tasks'; break;
     case 'dismissDue': dismissComingDue(); break;
+    case 'statSheet': openStatSheet(d.v); break;
     case 'viewDue': dismissComingDue(); ui.taskFilter = 'recurring'; ui.cleanGroup = 'due'; location.hash = '#tasks'; break;
     case 'addProject': projectForm(null); break;
     case 'addSub': projectForm(null, { parentId: d.id, group: d.group || '' }); break;
@@ -1641,7 +1693,7 @@ document.addEventListener('change', e => {
     updateFilterCount();
   }
 });
-$('#dlg').addEventListener('close', () => { formCtx = null; setTimeout(flushRender, 0); });
+$('#dlg').addEventListener('close', () => { formCtx = null; statOpen = null; setTimeout(flushRender, 0); });
 document.addEventListener('focusout', e => { if (e.target.id === 'updText') setTimeout(flushRender, 0); });
 
 /* ---------- start ---------- */
