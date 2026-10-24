@@ -109,6 +109,14 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .banner .x{color:#C9D3CF;margin:-6px -6px 0 0}
 .banner .acts{padding-left:44px}
 .banner .acts .btn{background:#fff;color:var(--ink);border-color:#fff;min-height:36px;font-size:13px}
+.banner.due{background:var(--warn-soft);color:var(--ink);border:1px solid #F2D3B0}
+.banner.due p.s{color:var(--soft)}
+.banner.due .x{color:var(--soft)}
+.banner.due .acts .btn{background:var(--ink);color:#fff;border-color:var(--ink)}
+.dueicon{flex:none;width:30px;height:30px;border-radius:999px;background:#fff;color:var(--warn);display:inline-flex;align-items:center;justify-content:center}
+.duelist{list-style:none;margin:0;padding:0 0 0 42px;display:flex;flex-direction:column;gap:6px}
+.duelist li{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.duelist .pill{font-size:11px;height:22px;background:#fff}
 
 /* avatars */
 .av{flex:none;width:30px;height:30px;border-radius:999px;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
@@ -543,6 +551,40 @@ function markSeen() {
   m.seenAt = nowISO();
   commit();
 }
+/* ---------- "coming up" banner: long-interval recurring tasks ---------- */
+const DUE_LEAD_DAYS = 3;   // start reminding this many days before the due date
+function isLongInterval(t) {   // repeats every 2 weeks or longer
+  if (isOneoff(t)) return false;
+  const n = +t.every.n || 1;
+  return t.every.unit === 'year' || t.every.unit === 'month' || (t.every.unit === 'week' && n >= 2) || (t.every.unit === 'day' && n >= 14);
+}
+function comingDue() {
+  const m = myMember(), dismissed = (m && m.dueDismissed) || {};
+  return data.tasks.filter(t => isLongInterval(t) && !doneToday(t))
+    .filter(t => { const d = dueInfo(t).d; return d >= 0 && d <= DUE_LEAD_DAYS && dismissed[t.id] !== nextDue(t); })
+    .sort((a, b) => nextDue(a).localeCompare(nextDue(b)));
+}
+function dismissComingDue() {
+  const m = myMember(); if (!m) return;
+  const keep = {};
+  Object.entries(m.dueDismissed || {}).forEach(([id, due]) => { const t = data.tasks.find(x => x.id === id); if (t && nextDue(t) === due) keep[id] = due; });
+  comingDue().forEach(t => { keep[t.id] = nextDue(t); });
+  m.dueDismissed = keep;
+  commit();
+}
+function dueBannerHTML() {
+  const list = comingDue(); if (!list.length) return '';
+  const when = t => { const di = dueInfo(t); return di.d === 0 ? 'Due today' : di.d === 1 ? 'Due tomorrow' : `Due ${WD[parseD(nextDue(t)).getDay()].slice(0, 3)}, ${fmt(nextDue(t))}`; };
+  return `<section class="banner due" role="status" aria-label="Coming up">
+    <div class="top"><span class="dueicon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+      <div style="flex:1;min-width:0"><p style="font-size:14px;font-weight:700">Coming up ${list.length === 1 ? '' : `· ${list.length} tasks`}</p>
+      <p class="s">Bigger jobs that don't come around often</p></div>
+      <button class="x" data-act="dismissDue" aria-label="Dismiss">×</button></div>
+    <ul class="duelist">${list.slice(0, 4).map(t => `<li><span style="min-width:0">${esc(t.name)}<span class="mut" style="font-weight:500;font-size:12px;display:block">${esc(everyText(t.every))}${roomName(t.roomId) ? ' · ' + esc(roomName(t.roomId)) : ''}</span></span>${pill(when(t), dueInfo(t).cls)}</li>`).join('')}${list.length > 4 ? `<li class="mut" style="font-weight:500">+${list.length - 4} more</li>` : ''}</ul>
+    <div class="acts"><button class="btn" data-act="viewDue">View tasks</button></div>
+  </section>`;
+}
+
 function bannerHTML() {
   const nt = newTodos(); if (!nt.length) return '';
   const by = [...new Set(nt.map(t => t.createdBy))];
@@ -717,7 +759,7 @@ function vToday() {
   const kicker = new Date().toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
   const acts = `<button class="btn" data-act="addProject">+ Project</button><button class="btn pri" data-act="addTask">+ Task</button>${gearBtn}`;
   if (!hasData()) {
-    return head(kicker, 'Today', gearBtn) + bannerHTML() + `<section class="card empty">
+    return head(kicker, 'Today', gearBtn) + bannerHTML() + dueBannerHTML() + `<section class="card empty">
       <h2>Welcome to Homebase</h2>
       <p>Start by adding your rooms, then your cleaning tasks, to-dos and projects. Or load some sample data to look around first — you can erase it later in Settings.</p>
       <div class="row-btns"><a class="btn pri" href="#rooms">Add rooms</a><button class="btn" data-act="addTask">+ Task</button><button class="btn" data-act="sample">Load sample data</button></div>
@@ -731,7 +773,7 @@ function vToday() {
   const doneWeek = events().filter(e => (e.kind === 'cleaning' || (e.kind === 'todo' && e.done)) && e.d >= weekAgo).length;
   const activeCount = data.projects.filter(p => !p.parentId && p.status !== 'done').length;
   const active = data.projects.filter(p => !isBig(p) && p.status === 'in-progress');
-  return head(kicker, 'Today', acts) + bannerHTML() + `
+  return head(kicker, 'Today', acts) + bannerHTML() + dueBannerHTML() + `
   <section class="stats" aria-label="Summary">
     <div class="card stat"><p>Due today</p><p>${due.length - overdue}</p></div>
     <div class="card stat"><p>Overdue</p><p style="color:${overdue ? 'var(--danger)' : 'inherit'}">${overdue}</p></div>
@@ -1532,6 +1574,8 @@ document.addEventListener('click', e => {
     }
     case 'dismissBanner': markSeen(); break;
     case 'viewNew': markSeen(); ui.taskFilter = 'todo'; location.hash = '#tasks'; break;
+    case 'dismissDue': dismissComingDue(); break;
+    case 'viewDue': dismissComingDue(); ui.taskFilter = 'recurring'; ui.cleanGroup = 'due'; location.hash = '#tasks'; break;
     case 'addProject': projectForm(null); break;
     case 'addSub': projectForm(null, { parentId: d.id, group: d.group || '' }); break;
     case 'editProject': projectForm(findP(d.id)); break;
