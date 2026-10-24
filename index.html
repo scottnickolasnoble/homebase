@@ -552,7 +552,11 @@ function markSeen() {
   commit();
 }
 /* ---------- "coming up" banner: long-interval recurring tasks ---------- */
-const DUE_LEAD_DAYS = 3;   // start reminding this many days before the due date
+// How many days ahead to start reminding: a week for monthly-or-longer jobs, 3 days for 2–3 week ones
+function leadDays(t) {
+  const n = +t.every.n || 1, u = t.every.unit;
+  return (u === 'month' || u === 'year' || (u === 'week' && n >= 4) || (u === 'day' && n >= 28)) ? 7 : 3;
+}
 function isLongInterval(t) {   // repeats every 2 weeks or longer
   if (isOneoff(t)) return false;
   const n = +t.every.n || 1;
@@ -561,7 +565,7 @@ function isLongInterval(t) {   // repeats every 2 weeks or longer
 function comingDue() {
   const m = myMember(), dismissed = (m && m.dueDismissed) || {};
   return data.tasks.filter(t => isLongInterval(t) && !doneToday(t))
-    .filter(t => { const d = dueInfo(t).d; return d >= 0 && d <= DUE_LEAD_DAYS && dismissed[t.id] !== nextDue(t); })
+    .filter(t => { const d = dueInfo(t).d; return d >= 0 && d <= leadDays(t) && dismissed[t.id] !== nextDue(t); })
     .sort((a, b) => nextDue(a).localeCompare(nextDue(b)));
 }
 function dismissComingDue() {
