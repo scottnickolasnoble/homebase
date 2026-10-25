@@ -1,6 +1,6 @@
 // Homebase service worker — lets the app open with no signal.
 // When you change index.html, bump the version below so phones pick up the new copy.
-const CACHE = 'homebase-v9';
+const CACHE = 'homebase-v10';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

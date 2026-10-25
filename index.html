@@ -532,7 +532,23 @@ function everyText(ev) {
   return n === 1 ? u[0] : `Every ${n} ${u[1]}s`;
 }
 const isOneoff = t => t.type === 'oneoff';
-const nextDue = t => isOneoff(t) ? (t.due || null) : (t.lastDone ? addEvery(t.lastDone, t.every) : todayISO());
+// Recurring tasks run on a fixed schedule: t.anchor is a date on the schedule, t.due is the next one owed.
+// Finishing early or late never shifts the schedule; missing several just means one catch-up.
+const nextDue = t => isOneoff(t) ? (t.due || null) : (t.due || todayISO());
+function occurrence(t, k) {          // the k-th scheduled date after the anchor (k = 0 is the anchor)
+  const a = parseD(t.anchor), n = Math.max(1, +t.every.n || 1) * k, u = t.every.unit;
+  if (u === 'day') return iso(new Date(a.getFullYear(), a.getMonth(), a.getDate() + n));
+  if (u === 'week') return iso(new Date(a.getFullYear(), a.getMonth(), a.getDate() + 7 * n));
+  const months = u === 'month' ? n : 12 * n, y = a.getFullYear(), m = a.getMonth() + months;
+  return iso(new Date(y, m, Math.min(a.getDate(), new Date(y, m + 1, 0).getDate())));   // 31st → last day of short months
+}
+function seqAfter(t, date) {         // first scheduled date strictly after `date`
+  if (date < t.anchor) return t.anchor;
+  const per = { day: 1, week: 7, month: 30.44, year: 365.25 }[t.every.unit] * Math.max(1, +t.every.n || 1);
+  let k = Math.max(0, Math.floor(daysBetween(t.anchor, date) / per) - 1);
+  for (let i = 0; i < 1000; i++, k++) { const o = occurrence(t, k); if (o > date) return o; }
+  return addEvery(date, t.every);
+}
 // Overdue = red, due today = amber, due within 3 days = blue, later or no date = grey (done today = green)
 function dueInfo(t) {
   const due = nextDue(t);
@@ -673,6 +689,8 @@ function normalize(d) {
       t.every = t.every && UNIT[t.every.unit] ? t.every : { n: 1, unit: 'week' };
       t.history = Array.isArray(t.history) ? t.history : [];
       t.log = Array.isArray(t.log) ? t.log : [];
+      if (!t.due) t.due = t.lastDone ? addEvery(t.lastDone, t.every) : todayISO();
+      if (!t.anchor) t.anchor = t.due;
     } else {
       t.done = !!t.done;
     }
@@ -875,7 +893,7 @@ function taskForm(t, preset = {}) {
   const isNew = !t;
   const type = t ? t.type : (preset.type || 'recurring');
   const one = type === 'oneoff';
-  const v = t ? { name: t.name, roomId: t.roomId || '', notes: t.notes || '', ...(one ? { due: t.due || '' } : { n: t.every.n, unit: t.every.unit, lastDone: t.lastDone || '' }) }
+  const v = t ? { name: t.name, roomId: t.roomId || '', notes: t.notes || '', ...(one ? { due: t.due || '' } : { n: t.every.n, unit: t.every.unit, due: t.due || todayISO() }) }
               : { name: preset.name || '', roomId: preset.roomId || '', notes: preset.notes || '', n: 1, unit: 'week', lastDone: '', due: preset.due ?? todayISO() };
   const seg = isNew ? `<div class="seg" role="radiogroup" aria-label="Task type" style="flex:1 1 100%">
       <button type="button" role="radio" aria-checked="${!one}" data-ttype="recurring">Repeats<small>Cleaning, chores</small></button>
@@ -885,7 +903,7 @@ function taskForm(t, preset = {}) {
   else fields.push(
     { key: 'n', label: 'Repeat every', type: 'number', min: 1, half: true },
     { key: 'unit', label: 'Unit', type: 'select', half: true, options: [['day', 'Days'], ['week', 'Weeks'], ['month', 'Months'], ['year', 'Years']] },
-    { key: 'lastDone', label: 'Last done (leave blank if never)', type: 'date' });
+    { key: 'due', label: 'Next due — it repeats on this day', type: 'date' });
   fields.push({ key: 'roomId', label: 'Room', type: 'select', options: roomOptions() }, { key: 'notes', label: one ? 'Notes' : 'Notes — supplies, how-to', type: 'textarea' });
   let extra = '';
   if (one) {
@@ -894,8 +912,9 @@ function taskForm(t, preset = {}) {
       <button type="button" class="chip" data-setdue="${upcomingSaturday()}">This weekend</button><button type="button" class="chip" data-setdue="">No date</button></div>`;
     if (!isNew && t.createdBy) extra += `<p class="hint">Added by ${esc(personName(t.createdBy, { you: 'you' }))}${t.createdAt ? ' on ' + fmt(dayOf(t.createdAt)) : ''}.</p>`;
     if (isNew && data.members.some(m => m.id !== me())) extra += `<p class="hint">${esc(data.members.filter(m => m.id !== me()).map(m => m.name || 'Your partner').join(' and '))} will see a "new to-do" banner next time they open Homebase.</p>`;
-  } else if (!isNew && t.history.length) {
-    extra = `<p class="hint">Done ${t.history.length} time${t.history.length > 1 ? 's' : ''}. Recent: ${t.history.slice(-6).reverse().map(fmt).join(', ')}</p>`;
+  } else {
+    extra = `<p class="hint">It stays on this schedule — finishing early or late doesn't move it, and if it's missed, one Done catches it up.</p>`;
+    if (!isNew && t.history.length) extra += `<p class="hint">Done ${t.history.length} time${t.history.length > 1 ? 's' : ''}. Recent: ${t.history.slice(-6).reverse().map(fmt).join(', ')}</p>`;
   }
   openForm({
     title: isNew ? 'New task' : (one ? 'Edit to-do' : 'Edit task'),
@@ -907,9 +926,14 @@ function taskForm(t, preset = {}) {
         if (isNew) data.tasks.push({ id: uid(), type: 'oneoff', done: false, createdAt: nowISO(), createdBy: me(), ...o });
         else Object.assign(t, o);
       } else {
-        const o = { name: x.name, roomId: x.roomId, every: { n: Math.max(1, Math.round(x.n || 1)), unit: x.unit }, lastDone: x.lastDone || null, notes: x.notes };
-        if (isNew) data.tasks.push({ id: uid(), type: 'recurring', history: [], log: [], ...o });
-        else Object.assign(t, o);
+        const every = { n: Math.max(1, Math.round(x.n || 1)), unit: x.unit }, due = x.due || todayISO();
+        const o = { name: x.name, roomId: x.roomId, every, notes: x.notes };
+        if (isNew) data.tasks.push({ id: uid(), type: 'recurring', history: [], log: [], lastDone: null, due, anchor: due, ...o });
+        else {
+          const moved = due !== t.due || every.n !== t.every.n || every.unit !== t.every.unit;
+          Object.assign(t, o);
+          if (moved) { t.due = due; t.anchor = due; }   // a new date or frequency starts a new schedule from that date
+        }
       }
     },
     onDelete: isNew ? null : () => { data.tasks = data.tasks.filter(x => x !== t); },
@@ -1378,9 +1402,13 @@ function cellState(t, d, today) {
   if (d > today) return { s: 'fut' };
   const dn = doneOn(t, d);
   if (dn) return { s: 'done', e: dn };
+  const before = t.log.filter(l => l.d < d && l.next).sort((a, b) => (a.d + (a.at || '')).localeCompare(b.d + (b.at || ''))).pop();
   const prior = [...t.history, t.lastDone].filter(x => x && x < d).sort().pop();
-  if (!prior) return { s: 'none' };
-  const due = addEvery(prior, t.every);
+  let due;
+  if (before && (!prior || before.d >= prior)) due = before.next;            // what was owed after the last Done
+  else if (prior) due = addEvery(prior, t.every);                           // older entries from before fixed schedules
+  else if (t.anchor && t.anchor <= d) due = t.anchor;
+  else return { s: 'none' };
   if (d < due) return { s: 'none' };
   if (d === due && d === today) return { s: 'today' };
   return { s: 'od', due };
@@ -1440,9 +1468,9 @@ function calendarItems(from, to) {
     }
     if (doneToday(t)) put(today, { t, type: 'rec', done: true });
     let cur = nextDue(t);
-    if (cur < today) { put(today, { t, type: 'rec', od: true, next: true }); cur = addEvery(today, t.every); }
-    else { put(cur, { t, type: 'rec', next: true }); cur = addEvery(cur, t.every); }
-    for (let i = 0; i < 400 && cur <= to; i++) { put(cur, { t, type: 'rec' }); cur = addEvery(cur, t.every); }
+    if (cur < today) { put(today, { t, type: 'rec', od: true, next: true }); cur = seqAfter(t, today); }
+    else { put(cur, { t, type: 'rec', next: true }); cur = seqAfter(t, cur); }
+    for (let i = 0; i < 400 && cur <= to; i++) { put(cur, { t, type: 'rec' }); cur = seqAfter(t, cur); }
   });
   data.projects.forEach(p => { if (p.targetDate && p.status !== 'done' && p.targetDate >= today) put(p.targetDate, { p, type: 'proj' }); });
   events().forEach(e => {
@@ -1483,7 +1511,11 @@ function vSchedule() {
     const rows = selItems.sort((a, b) => (b.od ? 1 : 0) - (a.od ? 1 : 0) || (a.done ? 1 : 0) - (b.done ? 1 : 0));
     list = rows.map(it => {
       if (it.type === 'proj') { const pr = progress(it.p); return `<a class="ms" href="#project/${it.p.id}"><span style="min-width:0"><span style="font-weight:600;display:block">${esc(it.p.name)}</span><span class="mut" style="font-size:12px">Project target date · ${pr}% done</span></span>${pill('Target', 'neu')}</a>`; }
-      if (it.next || it.done) return taskRow(it.t);
+      if (it.done || (it.next && (sel === today || !doneToday(it.t)))) return taskRow(it.t);
+      if (it.next) {   // next one owed, on a future day (it may also have been done today for the previous one)
+        const di = dueInfo(it.t);
+        return `<div class="trow"><button class="tmain" data-act="editTask" data-id="${it.t.id}"><span class="tname">${esc(it.t.name)}</span><span class="tsub">${esc(everyText(it.t.every))}${roomName(it.t.roomId) ? ' · ' + esc(roomName(it.t.roomId)) : ''}</span></button><div class="tside">${pill(di.label, di.cls)}</div></div>`;
+      }
       return `<div class="trow"><button class="tmain" data-act="editTask" data-id="${it.t.id}"><span class="tname">${esc(it.t.name)}</span><span class="tsub">${esc(everyText(it.t.every))}${roomName(it.t.roomId) ? ' · ' + esc(roomName(it.t.roomId)) : ''} · if done on schedule</span></button><div class="tside">${pill('Repeats', 'neu')}</div></div>`;
     }).join('') || '<p class="emptyline" style="border:0">Nothing due this day.</p>';
   }
@@ -1710,7 +1742,9 @@ document.addEventListener('click', e => {
     case 'editTask': taskForm(T()); break;
     case 'doneTask': {
       const t = T(); const td = todayISO();
-      t.prevLast = t.lastDone; t.lastDone = td; t.history.push(td); t.log.push({ d: td, at: nowISO(), by: me() });
+      t.prevLast = t.lastDone; t.prevDue = t.due;
+      t.due = seqAfter(t, t.due > td ? t.due : td);      // early: next one after this due date; late: next one after today
+      t.lastDone = td; t.history.push(td); t.log.push({ d: td, at: nowISO(), by: me(), next: t.due });
       commit(); toast('Nice work'); break;
     }
     case 'undoTask': {
@@ -1718,6 +1752,7 @@ document.addEventListener('click', e => {
       if (t.history[t.history.length - 1] === td) t.history.pop();
       const li = t.log.map(x => x.d).lastIndexOf(td); if (li >= 0) t.log.splice(li, 1);
       t.lastDone = t.prevLast !== undefined ? t.prevLast : ([...t.history].sort().pop() || null); delete t.prevLast;
+      if (t.prevDue) { t.due = t.prevDue; delete t.prevDue; }
       commit(); break;
     }
     case 'toggleTodo': {
