@@ -227,6 +227,23 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
 .c.today{background:#FFF8F0;box-shadow:inset 0 0 0 1.5px #D9A066}
 .c.fut{background:transparent;cursor:default}
 @media (max-width:500px){.gridcard .g{grid-template-columns:minmax(0,1fr) repeat(7,26px);column-gap:3px;padding:7px 12px}.c{width:26px;height:26px;border-radius:7px;font-size:11px}.gridcard .room{padding:10px 12px 6px}}
+.nav-desk{}
+@media (max-width:760px){.nav-desk{display:none!important}}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:4px 12px 14px}
+.cal-h{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
+.cal-d{min-height:56px;border:0;border-radius:10px;background:var(--tint);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;padding:7px 2px 6px;cursor:pointer;font-weight:600;font-size:14px;color:var(--ink)}
+.cal-d.out{opacity:.4}
+.cal-d.past{color:var(--muted)}
+.cal-d.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.cal-d.sel{background:var(--ink);color:#fff;box-shadow:none}
+.dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;align-items:center;min-height:6px;max-width:100%}
+.dot{width:6px;height:6px;border-radius:999px;flex:none}
+.dot.rec{background:var(--accent)} .dot.todo{background:var(--info)} .dot.proj{background:#7A5AA6} .dot.od{background:var(--danger)} .dot.done{background:#9AA7A2}
+.cal-d.sel .dot.done{background:#C8D2CE}
+.more{font-size:9px;font-weight:700;line-height:6px}
+.calnav{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 4px}
+.calnav button{width:44px;height:44px;border:0;background:none;font-size:24px;color:var(--soft);cursor:pointer;border-radius:10px}
+.legend .dot{width:8px;height:8px}
 .legend{display:flex;flex-wrap:wrap;gap:10px 14px;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--soft);font-weight:600}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend .c{width:18px;height:18px;font-size:9px;border-radius:5px;cursor:default}
@@ -278,6 +295,7 @@ dialog::backdrop{background:rgba(22,32,29,.35)}
     <a class="nav" data-tab="projects" href="#projects"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>Projects</a>
     <a class="nav" data-tab="rooms" href="#rooms"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Rooms</a>
     <a class="nav" data-tab="history" href="#history"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History</a>
+    <a class="nav nav-desk" data-tab="schedule" href="#schedule"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Schedule</a>
     <a class="nav nav-settings" data-tab="settings" href="#settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
   </nav>
   <main class="content" id="view" tabindex="-1"></main>
@@ -320,7 +338,7 @@ const synced = Object.fromEntries(COLLS.map(c => [c, new Map()]));  // id -> JSO
 let syncedMeta = '{}';
 let firstLoads = 0, pendingRender = false;
 const HIST_DEFAULT = () => ({ view: 'list', range: '7', from: '', to: '', who: 'all', kinds: ['cleaning', 'todo', 'update', 'step'], room: 'all', limit: 60, week: 0 });
-const ui = { taskFilter: 'all', cleanGroup: 'room', projFilter: 'all', showSubs: false, floor: 'all', hist: HIST_DEFAULT(), recentNew: new Set() };
+const ui = { taskFilter: 'all', cleanGroup: 'room', projFilter: 'all', showSubs: false, floor: 'all', hist: HIST_DEFAULT(), recentNew: new Set(), cal: { ym: '', sel: '', hideDaily: true } };
 
 /* ---------- old on-phone storage (only used to move data into the shared copy once) ---------- */
 const DB_NAME = 'homebase', STORE = 'kv';
@@ -675,7 +693,7 @@ function route() {
   v = { cleaning: 'tasks', more: 'settings' }[v] || v;
   return { v, id: id ? decodeURIComponent(id) : '' };
 }
-const VIEWS = { today: vToday, tasks: vTasks, projects: vProjects, project: vProject, rooms: vRooms, history: vHistory, settings: vSettings };
+const VIEWS = { today: vToday, tasks: vTasks, projects: vProjects, project: vProject, rooms: vRooms, history: vHistory, settings: vSettings, schedule: vSchedule };
 function render() {
   document.body.classList.toggle('signed-out', !user || !data);
   if (!configured) { $('#view').innerHTML = vSetup(); return; }
@@ -696,6 +714,7 @@ function render() {
 }
 const head = (kicker, title, actions = '') =>
   `<header class="phead"><div><p class="kicker">${esc(kicker)}</p><h1>${esc(title)}</h1></div><div class="hact">${actions}</div></header>`;
+const calBtn = `<a class="iconbtn" href="#schedule" aria-label="Schedule"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></a>`;
 const gearBtn = `<a class="iconbtn" href="#settings" aria-label="Settings and backup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></a>`;
 
 /* ---------- task rows ---------- */
@@ -766,9 +785,9 @@ async function doLogin(form) {
 /* ---------- Today ---------- */
 function vToday() {
   const kicker = new Date().toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
-  const acts = `<button class="btn" data-act="addProject">+ Project</button><button class="btn pri" data-act="addTask">+ Task</button>${gearBtn}`;
+  const acts = `<button class="btn" data-act="addProject">+ Project</button><button class="btn pri" data-act="addTask">+ Task</button>${calBtn}${gearBtn}`;
   if (!hasData()) {
-    return head(kicker, 'Today', gearBtn) + bannerHTML() + dueBannerHTML() + `<section class="card empty">
+    return head(kicker, 'Today', calBtn + gearBtn) + bannerHTML() + dueBannerHTML() + `<section class="card empty">
       <h2>Welcome to Homebase</h2>
       <p>Start by adding your rooms, then your cleaning tasks, to-dos and projects. Or load some sample data to look around first — you can erase it later in Settings.</p>
       <div class="row-btns"><a class="btn pri" href="#rooms">Add rooms</a><button class="btn" data-act="addTask">+ Task</button><button class="btn" data-act="sample">Load sample data</button></div>
@@ -1405,6 +1424,85 @@ function gridView() {
   <p class="sm-t mut">Tap a square to see who did it and when. One-off to-dos and project work stay in List view.</p>`;
 }
 
+/* ---------- Schedule (calendar) ---------- */
+const isDaily = t => !isOneoff(t) && t.every.unit === 'day' && (+t.every.n || 1) <= 1;
+// What lands on each day between from and to (inclusive). Today onward: what's due (recurring tasks
+// are projected forward on their schedule). Days before today: what got done.
+function calendarItems(from, to) {
+  const today = todayISO(), map = {};
+  const put = (d, item) => { if (d >= from && d <= to) (map[d] = map[d] || []).push(item); };
+  data.tasks.forEach(t => {
+    if (ui.cal.hideDaily && isDaily(t)) return;
+    if (isOneoff(t)) {
+      if (t.done) { if (doneToday(t)) put(today, { t, type: 'todo', done: true }); return; }
+      if (t.due) put(t.due < today ? today : t.due, { t, type: 'todo', od: t.due < today, next: true });
+      return;
+    }
+    if (doneToday(t)) put(today, { t, type: 'rec', done: true });
+    let cur = nextDue(t);
+    if (cur < today) { put(today, { t, type: 'rec', od: true, next: true }); cur = addEvery(today, t.every); }
+    else { put(cur, { t, type: 'rec', next: true }); cur = addEvery(cur, t.every); }
+    for (let i = 0; i < 400 && cur <= to; i++) { put(cur, { t, type: 'rec' }); cur = addEvery(cur, t.every); }
+  });
+  data.projects.forEach(p => { if (p.targetDate && p.status !== 'done' && p.targetDate >= today) put(p.targetDate, { p, type: 'proj' }); });
+  events().forEach(e => {
+    if (e.d >= today || !(e.kind === 'cleaning' || (e.kind === 'todo' && e.done))) return;
+    if (ui.cal.hideDaily && e.kind === 'cleaning' && data.tasks.some(t => t.name === e.what && isDaily(t))) return;
+    put(e.d, { e, type: 'past' });
+  });
+  return map;
+}
+function vSchedule() {
+  const today = todayISO();
+  if (!ui.cal.ym) ui.cal.ym = today.slice(0, 7);
+  if (!ui.cal.sel) ui.cal.sel = today;
+  const [y, m] = ui.cal.ym.split('-').map(Number);
+  const first = new Date(y, m - 1, 1), start = new Date(y, m - 1, 1 - first.getDay());
+  const lastOfMonth = new Date(y, m, 0);
+  const weeks = Math.ceil((first.getDay() + lastOfMonth.getDate()) / 7);
+  const days = [...Array(weeks * 7)].map((_, i) => iso(new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)));
+  const map = calendarItems(days[0], days[days.length - 1]);
+  const dotCls = it => it.type === 'past' || it.done ? 'done' : it.od ? 'od' : it.type;
+  const cells = days.map(d => {
+    const items = map[d] || [], inMonth = d.slice(0, 7) === ui.cal.ym;
+    const cls = ['cal-d', inMonth ? '' : 'out', d < today ? 'past' : '', d === today ? 'today' : '', d === ui.cal.sel ? 'sel' : ''].filter(Boolean).join(' ');
+    const dots = items.slice(0, 4).map(it => `<span class="dot ${dotCls(it)}"></span>`).join('') + (items.length > 4 ? `<span class="more">+${items.length - 4}</span>` : '');
+    const label = `${WD[parseD(d).getDay()]} ${fmt(d)}: ${items.length ? items.length + (d < today ? ' done' : ' due') : 'nothing'}`;
+    return `<button class="${cls}" data-act="calDay" data-v="${d}" aria-label="${esc(label)}"${d === ui.cal.sel ? ' aria-pressed="true"' : ''}>${parseD(d).getDate()}<span class="dots">${dots}</span></button>`;
+  }).join('');
+  const monthName = first.toLocaleDateString('en-CA', { month: 'long', year: 'numeric' });
+
+  // the selected day
+  const sel = ui.cal.sel, selItems = (calendarItems(sel, sel)[sel] || []);
+  const selDate = parseD(sel);
+  const selLabel = sel === today ? 'Today' : daysBetween(today, sel) === 1 ? 'Tomorrow' : `${WD[selDate.getDay()]}, ${fmt(sel)}`;
+  let list = '';
+  if (sel < today) {
+    list = selItems.map(it => evRow(it.e)).join('') || '<p class="emptyline" style="border:0">Nothing was marked done this day.</p>';
+  } else {
+    const rows = selItems.sort((a, b) => (b.od ? 1 : 0) - (a.od ? 1 : 0) || (a.done ? 1 : 0) - (b.done ? 1 : 0));
+    list = rows.map(it => {
+      if (it.type === 'proj') { const pr = progress(it.p); return `<a class="ms" href="#project/${it.p.id}"><span style="min-width:0"><span style="font-weight:600;display:block">${esc(it.p.name)}</span><span class="mut" style="font-size:12px">Project target date · ${pr}% done</span></span>${pill('Target', 'neu')}</a>`; }
+      if (it.next || it.done) return taskRow(it.t);
+      return `<div class="trow"><button class="tmain" data-act="editTask" data-id="${it.t.id}"><span class="tname">${esc(it.t.name)}</span><span class="tsub">${esc(everyText(it.t.every))}${roomName(it.t.roomId) ? ' · ' + esc(roomName(it.t.roomId)) : ''} · if done on schedule</span></button><div class="tside">${pill('Repeats', 'neu')}</div></div>`;
+    }).join('') || '<p class="emptyline" style="border:0">Nothing due this day.</p>';
+  }
+  const dailyN = data.tasks.filter(isDaily).length;
+  return `<a class="back" href="#today">← Today</a>` + head('What\'s due, day by day', 'Schedule', `<button class="btn pri" data-act="calAdd">+ To-do</button>`) + `
+  <section class="card clip">
+    <div class="calnav"><button data-act="calMonth" data-v="-1" aria-label="Previous month">‹</button>
+      <div style="text-align:center"><p style="font-size:16px;font-weight:700">${esc(monthName)}</p>${ui.cal.ym !== today.slice(0, 7) ? '<button class="chip" data-act="calToday" style="min-height:28px;margin-top:4px;font-size:12px">Back to today</button>' : ''}</div>
+      <button data-act="calMonth" data-v="1" aria-label="Next month">›</button></div>
+    <div class="cal" role="grid" aria-label="${esc(monthName)}">${'SMTWTFS'.split('').map(c => `<span class="cal-h" aria-hidden="true">${c}</span>`).join('')}${cells}</div>
+    <div class="legend"><span><span class="dot rec"></span>Recurring</span><span><span class="dot todo"></span>To-do</span><span><span class="dot od"></span>Overdue</span><span><span class="dot proj"></span>Project target</span><span><span class="dot done"></span>Done</span></div>
+  </section>
+  ${dailyN ? `<label class="sm-t" style="display:flex;align-items:center;gap:10px;font-weight:600;color:var(--soft);min-height:36px;cursor:pointer"><input type="checkbox" class="chk" data-act="calDaily"${ui.cal.hideDaily ? '' : ' checked'}> Show daily tasks (${dailyN}) on the calendar</label>` : ''}
+  <section class="card clip" id="calDayList">
+    <div class="hd"><h2>${esc(selLabel)}${sel === today || daysBetween(today, sel) === 1 ? `<span class="mut" style="font-size:13px;font-weight:500"> · ${esc(fmt(sel))}</span>` : ''}</h2>${sel >= today ? `<button class="btn sm" data-act="calAdd">+ To-do this day</button>` : ''}</div>
+    ${list}
+  </section>`;
+}
+
 /* ---------- Settings ---------- */
 function vSettings() {
   const m = myMember();
@@ -1631,6 +1729,16 @@ document.addEventListener('click', e => {
     case 'viewNew': markSeen(); ui.taskFilter = 'todo'; location.hash = '#tasks'; break;
     case 'dismissDue': dismissComingDue(); break;
     case 'statSheet': openStatSheet(d.v); break;
+    case 'calDay': {
+      ui.cal.sel = d.v; if (d.v.slice(0, 7) !== ui.cal.ym) ui.cal.ym = d.v.slice(0, 7);
+      render();
+      const l = $('#calDayList'); if (l && l.getBoundingClientRect().top > innerHeight * 0.6) l.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      break;
+    }
+    case 'calMonth': { const [yy, mm] = ui.cal.ym.split('-').map(Number); const n = new Date(yy, mm - 1 + Number(d.v), 1); ui.cal.ym = iso(n).slice(0, 7); render(); break; }
+    case 'calToday': ui.cal.ym = todayISO().slice(0, 7); ui.cal.sel = todayISO(); render(); break;
+    case 'calDaily': ui.cal.hideDaily = !ui.cal.hideDaily; render(); break;
+    case 'calAdd': taskForm(null, { type: 'oneoff', due: ui.cal.sel && ui.cal.sel >= todayISO() ? ui.cal.sel : todayISO() }); break;
     case 'viewDue': dismissComingDue(); ui.taskFilter = 'recurring'; ui.cleanGroup = 'due'; location.hash = '#tasks'; break;
     case 'addProject': projectForm(null); break;
     case 'addSub': projectForm(null, { parentId: d.id, group: d.group || '' }); break;
